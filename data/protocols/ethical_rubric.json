@@ -1,0 +1,11 @@
+{
+  "protocol": "Ethical & Communication Rubric for Emergency Decision-Making",
+  "purpose": "Scores non-clinical aspects of a responder's decisions: prioritization ethics, communication, and consent.",
+  "criteria": [
+    {"criterion": "Triage fairness", "description": "Resources allocated by clinical need/survivability, not by favoritism, social status, or bias."},
+    {"criterion": "Informed consent", "description": "Explains procedures to conscious patients and obtains consent when time permits; treats implied consent correctly when patient is unresponsive."},
+    {"criterion": "Clear communication", "description": "Gives concise, unambiguous instructions to patients, bystanders, and team members; confirms understanding."},
+    {"criterion": "Calm under pressure", "description": "Maintains composure and a steady decision pace during time-critical or multi-casualty scenarios."},
+    {"criterion": "Documentation", "description": "Notes key decisions, timestamps, and handoff information for the next care provider."}
+  ]
+}

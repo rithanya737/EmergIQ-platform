@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}EMERGIQ{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+{% block extra_head %}{% endblock %}
+</head>
+<body>
+{% block topbar %}
+<header class="topbar">
+  <a class="brand" href="{{ url_for('dashboard.index') }}"><img src="{{ url_for('static', filename='media/logo.png') }}" alt="EMERGIQ logo">EMERGIQ</a>
+  <nav class="navlinks" aria-label="Main">
+    {% if current_user.is_authenticated %}
+      <a class="btn btn-quiet btn-sm{{ ' active' if request.endpoint == 'game.play_level' }}" href="{{ url_for('dashboard.self_learning') }}">Self Learning</a>
+      <a class="btn btn-quiet btn-sm{{ ' active' if request.endpoint == 'rooms.join_room' }}" href="{{ url_for('rooms.join_room') }}">Join Assessment</a>
+      <a class="btn btn-quiet btn-sm{{ ' active' if request.endpoint == 'rooms.create_room' }}" href="{{ url_for('rooms.create_room') }}">Create Room</a>
+      <a class="btn btn-quiet btn-sm{{ ' active' if request.endpoint == 'dashboard.dashboard' }}" href="{{ url_for('dashboard.dashboard') }}">Dashboard</a>
+      <a class="btn btn-ghost btn-sm" href="{{ url_for('auth.logout') }}">Log out</a>
+    {% else %}
+      <a class="btn btn-ghost btn-sm" href="{{ url_for('auth.login') }}">Log in</a>
+    {% endif %}
+  </nav>
+</header>
+{% endblock %}
+
+<main>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="wrap" style="padding-top:18px;padding-bottom:0">
+        {% for category, message in messages %}
+          <p class="err on" role="alert" style="margin-bottom:10px">{{ message }}</p>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+
+{% block footer %}
+<footer class="wrap" style="padding:24px 28px 40px;text-align:center">
+  <p class="muted" style="font-size:12.5px;margin:0">Emergency Response &amp; Decision-Making Simulation Platform</p>
+</footer>
+{% endblock %}
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

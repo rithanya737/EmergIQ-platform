@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}EMERGIQ — Level {{ level }}{% endblock %}
+{% block topbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<section id="s-sim" class="screen on">
+  {% if show_intro_video %}
+  <div class="intro-video-overlay" id="introVideoOverlay" hidden>
+    <div class="intro-video-box">
+      <video id="introVideo" src="{{ intro_video_url }}" controls playsinline></video>
+      <button class="btn btn-ghost btn-sm intro-video-skip" id="introVideoSkip" type="button" disabled>
+        Skip in <span id="introSkipCount">3</span>s
+      </button>
+    </div>
+  </div>
+  {% endif %}
+  <div class="sim" id="game-shell" data-level="{{ level }}">
+    <div class="simhead">
+      <div class="left">
+        <a class="brand" href="{{ url_for('dashboard.dashboard') }}" style="font-size:14px" title="Save and exit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M1 12h5l2-6 4 12 3-8 2 2h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>EMERGIQ</a>
+        <span class="pill info">{{ context_label }}</span>
+        <form method="POST" action="{{ url_for('game.exit_level', level=level) }}" style="display:inline" onsubmit="return confirm('Exit this level? Your progress on this attempt will not be saved.');">
+          <button class="btn btn-quiet btn-sm" type="submit">Save &amp; exit</button>
+        </form>
+      </div>
+      <div class="simtitle">Level {{ level }} &middot; {{ level_title }}</div>
+      <div class="timer" id="timerBox"><span class="lab">TIME</span><span class="val" id="timerVal">--:--</span></div>
+    </div>
+
+    <div class="simbody">
+      <!-- LEFT: avatar -->
+      <div class="stage">
+        <div class="nametag">
+          <div class="n"><span class="speakdot"></span>NURSE MAYA</div>
+          <div class="r">Senior Emergency Nurse</div>
+        </div>
+        <div class="avatarwrap">
+          <svg id="maya" viewBox="0 0 200 340" role="img" aria-label="Nurse Maya avatar">
+            <defs>
+              <linearGradient id="scrub" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1E7F86"/><stop offset="1" stop-color="#115D68"/></linearGradient>
+              <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C98B63"/><stop offset="1" stop-color="#B0724D"/></linearGradient>
+              <radialGradient id="glow"><stop offset="0" stop-color="#7EE8E1" stop-opacity=".4"/><stop offset="1" stop-color="#7EE8E1" stop-opacity="0"/></radialGradient>
+            </defs>
+            <ellipse cx="100" cy="322" rx="66" ry="16" fill="url(#glow)"/>
+            <path d="M66 74c0-22 15-38 34-38s34 16 34 38c0 12 4 22 4 34 0 8-6 12-12 8V74z" fill="#241B1B"/>
+            <path d="M136 92c10 14 10 34 4 48-3 7-11 6-12-2l-2-30z" fill="#2E2323"/>
+            <path d="M90 104h20v22c0 6-20 6-20 0z" fill="#B0724D"/>
+            <path d="M100 122c-16 0-30 6-38 16-8 10-10 28-10 44l2 68c0 6 4 10 10 10h72c6 0 10-4 10-10l2-68c0-16-2-34-10-44-8-10-22-16-38-16z" fill="url(#scrub)"/>
+            <path d="M84 124l16 22 16-22-8-4-8 10-8-10z" fill="#0C4650"/>
+            <path d="M62 138c-8 8-12 26-12 44l2 44c0 6 10 6 11 0l6-46z" fill="#1B767D"/>
+            <path d="M138 138c8 8 12 26 12 44l-2 44c0 6-10 6-11 0l-6-46z" fill="#1B767D"/>
+            <circle cx="55" cy="228" r="9" fill="url(#skin)"/><circle cx="145" cy="228" r="9" fill="url(#skin)"/>
+            <path d="M72 260h24l-4 68c0 5-16 5-16 0z" fill="#0E4C57"/>
+            <path d="M104 260h24l-4 68c0 5-16 5-16 0z" fill="#0E4C57"/>
+            <rect x="70" y="326" width="30" height="10" rx="5" fill="#E8F2F7"/>
+            <rect x="102" y="326" width="30" height="10" rx="5" fill="#E8F2F7"/>
+            <rect x="112" y="160" width="22" height="30" rx="4" fill="#E8F2F7" stroke="#9FCBD2"/>
+            <rect x="116" y="166" width="14" height="9" rx="2" fill="#20D6D0" opacity=".55"/>
+            <rect x="116" y="179" width="14" height="2.5" rx="1" fill="#7E97AB"/>
+            <rect x="116" y="184" width="9" height="2.5" rx="1" fill="#7E97AB"/>
+            <path d="M86 128c-4 26 6 44 14 44s18-18 14-44" fill="none" stroke="#0B3D45" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="114" cy="176" r="6" fill="#9BE3E0" stroke="#0B3D45" stroke-width="2"/>
+            <ellipse cx="100" cy="76" rx="30" ry="34" fill="url(#skin)"/>
+            <path d="M70 70c0-20 13-34 30-34s30 14 30 34c0 4-2 6-4 2-6-12-16-16-26-16-8 0-18 4-22 14-2 5-8 5-8 0z" fill="#241B1B"/>
+            <g id="mayaEyes"><ellipse cx="88" cy="76" rx="3.6" ry="4.2" fill="#1A1414"/><ellipse cx="112" cy="76" rx="3.6" ry="4.2" fill="#1A1414"/></g>
+            <path d="M82 66c4-3 9-3 12 0M106 66c4-3 9-3 12 0" stroke="#241B1B" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+            <path id="mayaMouth" d="M92 92q8 5 16 0" stroke="#7A3F33" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+            <path d="M72 54c6-14 16-22 28-22s22 8 28 22c-18-8-38-8-56 0z" fill="#20D6D0" opacity=".9"/>
+            <path d="M96 40h8v6h6v8h-6v6h-8v-6h-6v-8h6z" fill="#0A3B44"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- CENTER: Maya conversation -->
+      <div class="conv">
+        <div class="bubble">
+          <div class="who"><b id="speakerName">NURSE MAYA</b><span class="pill info" id="scenario-text">Briefing</span></div>
+          <div id="nurse-log"></div>
+          <div id="bubble-actions" style="margin-top:16px"></div>
+        </div>
+      </div>
+
+      <!-- RIGHT: medical report -->
+      <aside class="report">
+        <div class="rephead">
+          <h3>Patient Medical Report</h3>
+          <div class="sub">EMERGIQ Emergency Medical Center &middot; Chennai</div>
+        </div>
+        <div id="patient-hud"></div>
+        <p class="repnote">Chart updates live as the patient's condition changes.</p>
+      </aside>
+    </div>
+
+    <!-- BOTTOM: decision options (hidden during the briefing) -->
+    <div class="qband" id="qband" hidden>
+      <div class="qinner">
+        <span class="eyebrow q" id="qLabel">Your decision</span>
+        <div class="opts" id="scenario-options" role="group" aria-label="Answer options"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  window.MEDSIM_INITIAL_DECISION = {{ decision|tojson }};
+  window.MEDSIM_LEVEL = {{ level }};
+  window.MEDSIM_REMAINING_SECONDS = {{ remaining_seconds|tojson }};
+  window.MEDSIM_INTRO = {{ intro_phases|tojson }};
+  window.MEDSIM_IS_NEW_ATTEMPT = {{ is_new_attempt|tojson }};
+  window.MEDSIM_IS_ASSESSMENT = {{ is_assessment|tojson }};
+  window.MEDSIM_SHOW_INTRO_VIDEO = {{ show_intro_video|tojson }};
+</script>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/game.js') }}"></script>
+{% endblock %}

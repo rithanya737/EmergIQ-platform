@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}EMERGIQ — {{ room.name }}{% endblock %}
+{% block content %}
+<div class="wrap page" style="max-width:640px">
+  <span class="eyebrow">Assessment room</span>
+  <h1 class="ptt" style="margin:8px 0 6px">{{ room.name }}</h1>
+  <div style="margin:18px 0 8px">
+    <span class="eyebrow q" style="display:block;margin-bottom:8px">Room code</span>
+    <div class="codebox">{{ room.code }}</div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <span class="eyebrow q">Room details</span>
+    <div style="margin-top:10px">
+      <div class="stat"><span class="k">Host</span><span class="v">{{ room.instructor.name }}</span></div>
+      <div class="stat"><span class="k">Levels</span><span class="v" style="text-align:right;max-width:60%">{{ level_summary|join(', ') }}</span></div>
+      <div class="stat"><span class="k">Difficulty</span><span class="v">{{ room.difficulty|capitalize }}</span></div>
+      <div class="stat"><span class="k">Assessment window</span><span class="v">{{ room.from_date.strftime('%d %b') if room.from_date }} &ndash; {{ room.to_date.strftime('%d %b %Y') if room.to_date }}</span></div>
+      <div class="stat"><span class="k">Participants</span><span class="v">{{ participant_count }} / {{ room.participant_limit }}</span></div>
+      {% if member %}
+        <div class="stat"><span class="k">Your progress</span><span class="v">{{ member.levels_completed()|length }} / {{ room.level_set|length }} levels</span></div>
+      {% endif %}
+    </div>
+
+    <div style="margin-top:18px">
+      {% if not member %}
+        {% if room.status in ('waiting', 'active') %}
+          <div class="empty"><div class="big">You have not joined this room.</div>Join to take part in this assessment.</div>
+          <div class="actions">
+            <form method="POST" action="{{ url_for('rooms.join_room') }}"><input type="hidden" name="code" value="{{ room.code }}"><button class="btn btn-primary" type="submit">Join Assessment</button></form>
+          </div>
+        {% else %}
+          <div class="empty"><div class="big">This assessment has finished.</div></div>
+        {% endif %}
+      {% elif member.finished_at %}
+        <div class="empty"><div class="big">You have completed this assessment.</div>Every level in this room is done.</div>
+        <div class="actions"><a class="btn btn-ghost" href="{{ url_for('rooms.room_leaderboard', code=room.code) }}">View Leaderboard</a></div>
+      {% elif room.status == 'waiting' %}
+        <div class="empty"><div class="big">Waiting for the host to start</div>You will be able to enter as soon as the assessment begins.</div>
+        <div class="actions"><a class="btn btn-ghost" href="{{ url_for('rooms.room_leaderboard', code=room.code) }}">View Leaderboard</a></div>
+      {% elif room.status == 'active' %}
+        <div class="empty">
+          <div class="big">The assessment is live.</div>
+          {% if next_level %}Next up: Level {{ '%02d'|format(next_level) }}.{% else %}Enter when you are ready — the timer starts the moment you begin.{% endif %}
+        </div>
+        <div class="actions">
+          <a class="btn btn-primary" href="{{ url_for('rooms.enter_assessment', code=room.code) }}">{{ 'Continue Assessment' if attempt else 'Enter Assessment' }}</a>
+          <a class="btn btn-ghost" href="{{ url_for('rooms.room_leaderboard', code=room.code) }}">View Leaderboard</a>
+        </div>
+      {% else %}
+        <div class="empty"><div class="big">This assessment has finished.</div></div>
+        <div class="actions"><a class="btn btn-ghost" href="{{ url_for('rooms.room_leaderboard', code=room.code) }}">View Leaderboard</a></div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

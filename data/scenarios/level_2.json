@@ -1,0 +1,935 @@
+{
+  "level_id": 2,
+  "level_name": "Resource Under Pressure",
+  "codename": "EmergIQ - Resource Under Pressure",
+  "difficulty": "Medium",
+  "patient_count": 1,
+  "main_skill": "Analyze the patient's condition AND manage limited resources",
+  "core_question": "What should I do, and how should I use my limited resources?",
+  "protocol_reference": {
+    "primary_source": "esi_levels.json",
+    "attribution": "AHRQ ESI (Emergency Severity Index) Handbook",
+    "usage_note": "Correct-path decisions match ESI resource-prediction logic: use the minimum resources needed to correctly manage a high-acuity presentation. Options that over-order (resource waste) or under-order (missed necessary resource) are penalized."
+  },
+  "note": "All names, vitals, and clinical details below are entirely fictional training content generated for simulation purposes.",
+  "resource_pool_at_level_start": {
+    "ecg_machine": 1,
+    "oxygen_cylinder": 1,
+    "iv_cannula_kit": 2,
+    "aspirin_dose": 1,
+    "gtn_spray": 1,
+    "troponin_test_kit": 1,
+    "defibrillator_shared": 1,
+    "note": "This is the only bay's stock for the shift. Every unit consumed is unavailable to the two other patients waiting in the department (referenced narratively by Nurse Maya but not directly simulated)."
+  },
+  "intro_sequence": {
+    "phase_1_nurse_intro": {
+      "character": "Nurse Maya",
+      "dialogue": [
+        "Doctor, we have a 52-year-old woman with sudden crushing chest pain.",
+        "She's sweaty and anxious. Two more patients are waiting in triage, so our supplies for this bay are limited for the rest of the shift.",
+        "Use what you need -- but only what you need."
+      ]
+    }
+  },
+  "patients": [
+    {
+      "patient_id": "P1",
+      "name": "Meera Iyer",
+      "age": 52,
+      "sex": "Female",
+      "chief_complaint": "Sudden crushing central chest pain, radiating to left arm, onset 20 minutes ago",
+      "arrival_mode": "Brought in by family, diaphoretic and anxious",
+      "initial_status": "AT_RISK",
+      "initial_vitals": {
+        "HR_bpm": 108,
+        "SpO2_percent": 95,
+        "RR_per_min": 22,
+        "BP_mmHg": "148/92",
+        "consciousness": "Conscious, alert, anxious"
+      },
+      "medical_report": {
+        "patient_id": "RKEMC-2026-00151",
+        "name": "Meera Iyer",
+        "age": 52,
+        "sex": "Female",
+        "blood_group": "O+",
+        "known_allergies": "None reported",
+        "past_medical_history": "Type 2 diabetes (diet-controlled), hypertension",
+        "current_medications": "Metformin 500mg BD",
+        "presenting_complaint": "Crushing central chest pain radiating to left arm, diaphoresis, onset 20 minutes prior to arrival",
+        "vitals_on_arrival": {
+          "HR_bpm": 108,
+          "SpO2_percent": 95,
+          "RR_per_min": 22,
+          "BP_mmHg": "148/92",
+          "Temp_C": 36.9,
+          "GCS": "15/15"
+        },
+        "triage_category_esi": "ESI-2 (high-risk presentation, likely requires multiple resources: ECG, cardiac markers, IV access, monitoring)",
+        "time_of_arrival": "14:03",
+        "assigned_team": "Emergency Bay 1 - Dr. (Player), Nurse Maya"
+      }
+    }
+  ],
+  "decision_tree": {
+    "D1_INITIAL_RESPONSE": {
+      "patient_id": "P1",
+      "applies_to_status": "AT_RISK",
+      "nurse_dialogue": [
+        "Doctor, she's clutching her chest and sweating. What would you like to do first?"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Get an immediate 12-lead ECG, attach the pulse oximeter, and give aspirin while assessing her.",
+          "protocol_alignment": "ESI-consistent minimal-necessary resource use for suspected ACS",
+          "quality": "optimal",
+          "resource_use": [
+            "ecg_machine",
+            "aspirin_dose"
+          ],
+          "resource_efficiency": "optimal - exactly the resources a suspected ACS presentation requires",
+          "vitals_delta": {
+            "HR_bpm": "108 -> 106 (down)",
+            "SpO2_percent": "95 -> 96 (up)",
+            "RR_per_min": "22 -> 21 (down)",
+            "BP_mmHg": "148/92 -> 146/90 (down)"
+          },
+          "new_status": "AT_RISK",
+          "nurse_response": [
+            "ECG shows ST changes in the lateral leads, Doctor. Aspirin given.",
+            "What would you like to do next?"
+          ],
+          "next_decision": "D2_AT_RISK"
+        },
+        {
+          "option_id": "B",
+          "text": "Order a full panel: ECG, chest CT, complete metabolic panel, and abdominal ultrasound all at once.",
+          "protocol_alignment": "Over-ordering; wastes shared resources and delays the one test that matters (ECG) behind a queue",
+          "quality": "resource_waste",
+          "resource_use": [
+            "ecg_machine",
+            "troponin_test_kit",
+            "radiology_slot_ct",
+            "radiology_slot_us"
+          ],
+          "resource_efficiency": "wasteful - consumed the troponin kit and both radiology slots meant for other patients, without addressing chest pain protocol first",
+          "vitals_delta": {
+            "HR_bpm": "108 -> 114 (up)",
+            "SpO2_percent": "95 -> 93 (down)",
+            "RR_per_min": "22 -> 25 (up)",
+            "BP_mmHg": "148/92 -> 144/88 (down)"
+          },
+          "new_status": "DETERIORATING",
+          "nurse_response": [
+            "Doctor, we've used almost everything in the bay and she still hasn't been assessed properly.",
+            "She's getting more uncomfortable."
+          ],
+          "next_decision": "D2_DETERIORATING"
+        },
+        {
+          "option_id": "C",
+          "text": "Wait for the troponin blood result before doing anything else.",
+          "protocol_alignment": "Delays the immediately-available ECG in favor of a slower test; violates rapid ACS assessment sequence",
+          "quality": "delay",
+          "resource_use": [
+            "troponin_test_kit"
+          ],
+          "resource_efficiency": "inefficient - troponin takes time to result and does not substitute for an immediate ECG",
+          "vitals_delta": {
+            "HR_bpm": "108 -> 116 (up)",
+            "SpO2_percent": "95 -> 92 (down)",
+            "RR_per_min": "22 -> 26 (up)",
+            "BP_mmHg": "148/92 -> 140/86 (down)"
+          },
+          "new_status": "DETERIORATING",
+          "nurse_response": [
+            "Doctor, we're still waiting on the lab, and she's getting worse.",
+            "Should we act now?"
+          ],
+          "next_decision": "D2_DETERIORATING"
+        },
+        {
+          "option_id": "D",
+          "text": "Give her strong opioid analgesia and send her to the general ward to rest.",
+          "protocol_alignment": "Masks symptoms without diagnosis; removes an unstable chest-pain patient from monitored care",
+          "quality": "critical_error",
+          "resource_use": [
+            "opioid_dose"
+          ],
+          "resource_efficiency": "misused - the wrong resource for an undiagnosed chest pain presentation",
+          "vitals_delta": {
+            "HR_bpm": "108 -> 122 (up)",
+            "SpO2_percent": "95 -> 90 (down)",
+            "RR_per_min": "22 -> 28 (up)",
+            "BP_mmHg": "148/92 -> 128/80 (down)"
+          },
+          "new_status": "CRITICAL",
+          "nurse_response": [
+            "Doctor! She's collapsed on the ward -- we need to bring her back to resus immediately!"
+          ],
+          "next_decision": "D2_CRITICAL"
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 15,
+        "resources_optimal": [
+          "ecg_machine",
+          "aspirin_dose"
+        ]
+      }
+    },
+    "D2_AT_RISK": {
+      "patient_id": "P1",
+      "applies_to_status": "AT_RISK",
+      "nurse_dialogue": [
+        "ECG confirms ST changes, Doctor. What would you like to do next?"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Secure IV access, give GTN spray, start oxygen only if saturation drops below 94%, and activate the cath-lab pathway.",
+          "protocol_alignment": "ESI-consistent staged resource use - oxygen reserved for hypoxia rather than given routinely",
+          "quality": "optimal",
+          "resource_use": [
+            "iv_cannula_kit",
+            "gtn_spray"
+          ],
+          "resource_efficiency": "optimal - oxygen cylinder preserved since SpO2 is 96%, in line with ESI resource-conservation logic",
+          "vitals_delta": {
+            "HR_bpm": "106 -> 100 (down)",
+            "SpO2_percent": "96 -> 97 (up)",
+            "RR_per_min": "21 -> 19 (down)",
+            "BP_mmHg": "146/90 -> 138/86 (down)"
+          },
+          "new_status": "AT_RISK_IMPROVING",
+          "nurse_response": [
+            "She says the pain is easing, Doctor.",
+            "Cath-lab has been notified."
+          ],
+          "next_decision": "D3_RECOVERING"
+        },
+        {
+          "option_id": "B",
+          "text": "Give oxygen at high flow regardless of saturation, 'just to be safe'.",
+          "protocol_alignment": "Unnecessary resource consumption without clinical indication (SpO2 already 96%)",
+          "quality": "resource_waste",
+          "resource_use": [
+            "oxygen_cylinder"
+          ],
+          "resource_efficiency": "wasteful - the only oxygen cylinder in the bay is now depleted and unavailable if a truly hypoxic patient needs it",
+          "vitals_delta": {
+            "HR_bpm": "106 -> 104 (down slightly)",
+            "SpO2_percent": "96 -> 97 (up, but from an unindicated resource)",
+            "RR_per_min": "21 -> 20 (down)",
+            "BP_mmHg": "146/90 -> 144/88 (down)"
+          },
+          "new_status": "AT_RISK",
+          "nurse_response": [
+            "Her oxygen is fine, Doctor, but we've now used our only cylinder for the shift."
+          ],
+          "next_decision": "D3_DETERIORATING"
+        },
+        {
+          "option_id": "C",
+          "text": "Continue observing without giving GTN or securing IV access.",
+          "protocol_alignment": "No active management of confirmed ACS",
+          "quality": "delay",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "106 -> 112 (up)",
+            "SpO2_percent": "96 -> 94 (down)",
+            "RR_per_min": "21 -> 24 (up)",
+            "BP_mmHg": "146/90 -> 150/94 (up)"
+          },
+          "new_status": "DETERIORATING",
+          "nurse_response": [
+            "Doctor, her pain is worsening and her pressure is climbing.",
+            "We should be doing something."
+          ],
+          "next_decision": "D3_DETERIORATING"
+        },
+        {
+          "option_id": "D",
+          "text": "Request the defibrillator to be brought to bedside pre-emptively and keep it running, even though she is not in a shockable rhythm.",
+          "protocol_alignment": "Ties up the department's shared defibrillator without a shockable indication",
+          "quality": "resource_waste",
+          "resource_use": [
+            "defibrillator_shared"
+          ],
+          "resource_efficiency": "wasteful - the shared defibrillator is now unavailable to any other bay that may need it for an actual arrhythmia",
+          "vitals_delta": {
+            "HR_bpm": "106 -> 108 (up slightly, patient anxious about the equipment)",
+            "SpO2_percent": "96 -> 95 (down)",
+            "RR_per_min": "21 -> 22 (up)",
+            "BP_mmHg": "146/90 -> 148/92 (up)"
+          },
+          "new_status": "AT_RISK",
+          "nurse_response": [
+            "Doctor, she's more anxious now, and the crash team just paged asking where the defibrillator is."
+          ],
+          "next_decision": "D3_DETERIORATING"
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 12,
+        "resources_optimal": [
+          "iv_cannula_kit",
+          "gtn_spray"
+        ]
+      }
+    },
+    "D2_DETERIORATING": {
+      "patient_id": "P1",
+      "applies_to_status": "DETERIORATING",
+      "nurse_dialogue": [
+        "Doctor, she's more uncomfortable and her vitals are trending the wrong way.",
+        "What would you like to do now?"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Get the ECG (if not yet done) or repeat it, secure IV access, give aspirin and GTN, and activate the cath-lab pathway now.",
+          "protocol_alignment": "Recovers the correct ACS pathway using only the resources actually indicated",
+          "quality": "optimal",
+          "resource_use": [
+            "ecg_machine",
+            "iv_cannula_kit",
+            "aspirin_dose",
+            "gtn_spray"
+          ],
+          "resource_efficiency": "corrective - late but resource-appropriate",
+          "vitals_delta": {
+            "HR_bpm": "116 -> 108 (down)",
+            "SpO2_percent": "92 -> 95 (up)",
+            "RR_per_min": "26 -> 22 (down)",
+            "BP_mmHg": "140/86 -> 138/86 (down)"
+          },
+          "new_status": "RECOVERING",
+          "nurse_response": [
+            "She's settling a little, Doctor.",
+            "Still needs close monitoring."
+          ],
+          "next_decision": "D3_RECOVERING"
+        },
+        {
+          "option_id": "B",
+          "text": "Order another full battery of unrelated investigations.",
+          "protocol_alignment": "Continued resource waste while the patient deteriorates",
+          "quality": "resource_waste",
+          "resource_use": [
+            "radiology_slot_ct"
+          ],
+          "resource_efficiency": "wasteful",
+          "vitals_delta": {
+            "HR_bpm": "116 -> 122 (up)",
+            "SpO2_percent": "92 -> 89 (down)",
+            "RR_per_min": "26 -> 29 (up)",
+            "BP_mmHg": "140/86 -> 130/80 (down)"
+          },
+          "new_status": "CRITICAL",
+          "nurse_response": [
+            "Doctor, she's getting worse and we're out of most of our supplies."
+          ],
+          "next_decision": "D3_CRITICAL"
+        },
+        {
+          "option_id": "C",
+          "text": "Continue watching without intervening.",
+          "protocol_alignment": "No action on a known ACS patient who is deteriorating",
+          "quality": "critical_error",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "116 -> 124 (up)",
+            "SpO2_percent": "92 -> 88 (down)",
+            "RR_per_min": "26 -> 30 (up)",
+            "BP_mmHg": "140/86 -> 126/78 (down)"
+          },
+          "new_status": "CRITICAL",
+          "nurse_response": [
+            "Doctor, we need to act -- she's not improving on her own."
+          ],
+          "next_decision": "D3_CRITICAL"
+        },
+        {
+          "option_id": "D",
+          "text": "Use the shared defibrillator pre-emptively even though her rhythm is not shockable.",
+          "protocol_alignment": "Inappropriate resource use for the current rhythm",
+          "quality": "resource_waste",
+          "resource_use": [
+            "defibrillator_shared"
+          ],
+          "resource_efficiency": "wasteful and clinically inappropriate",
+          "vitals_delta": {
+            "HR_bpm": "116 -> 120 (up)",
+            "SpO2_percent": "92 -> 90 (down)",
+            "RR_per_min": "26 -> 28 (up)",
+            "BP_mmHg": "140/86 -> 128/80 (down)"
+          },
+          "new_status": "CRITICAL",
+          "nurse_response": [
+            "Doctor, that's not going to help her right now -- and the crash team needs that unit back."
+          ],
+          "next_decision": "D3_CRITICAL"
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 10,
+        "resources_optimal": [
+          "ecg_machine",
+          "iv_cannula_kit",
+          "aspirin_dose",
+          "gtn_spray"
+        ]
+      }
+    },
+    "D2_CRITICAL": {
+      "patient_id": "P1",
+      "applies_to_status": "CRITICAL",
+      "nurse_dialogue": [
+        "Doctor, she collapsed and is now critical.",
+        "What is your immediate priority?"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Call a crash call, bring the shared defibrillator, secure IV access, and begin emergency ACS management immediately.",
+          "protocol_alignment": "Correct emergency escalation using every remaining indicated resource",
+          "quality": "optimal",
+          "resource_use": [
+            "defibrillator_shared",
+            "iv_cannula_kit",
+            "escalation_call"
+          ],
+          "resource_efficiency": "optimal under a true emergency indication",
+          "vitals_delta": {
+            "HR_bpm": "122 -> 114 (down)",
+            "SpO2_percent": "90 -> 93 (up)",
+            "RR_per_min": "28 -> 25 (down)",
+            "BP_mmHg": "128/80 -> 132/82 (up)"
+          },
+          "new_status": "RECOVERING",
+          "nurse_response": [
+            "She's stabilizing a little, Doctor.",
+            "Cath-lab is on standby."
+          ],
+          "next_decision": "D3_RECOVERING"
+        },
+        {
+          "option_id": "B",
+          "text": "Order additional imaging before acting.",
+          "protocol_alignment": "Fails to act on a critical patient",
+          "quality": "critical_error",
+          "resource_use": [
+            "radiology_slot_ct"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "122 -> 130 (up)",
+            "SpO2_percent": "90 -> 85 (down)",
+            "RR_per_min": "28 -> 32 (up)",
+            "BP_mmHg": "128/80 -> 110/70 (down)"
+          },
+          "new_status": "PERI_ARREST",
+          "nurse_response": [
+            "Doctor, we're losing her -- we need to act now!"
+          ],
+          "next_decision": "D3_CRITICAL"
+        },
+        {
+          "option_id": "C",
+          "text": "Wait for the next available bed on the cardiology ward before doing anything further.",
+          "protocol_alignment": "No emergency management of a critical patient",
+          "quality": "critical_error",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "122 -> 132 (up)",
+            "SpO2_percent": "90 -> 84 (down)",
+            "RR_per_min": "28 -> 33 (up)",
+            "BP_mmHg": "128/80 -> 105/68 (down)"
+          },
+          "new_status": "PERI_ARREST",
+          "nurse_response": [
+            "Doctor, there's no time -- she needs care here, now."
+          ],
+          "next_decision": "D3_CRITICAL"
+        },
+        {
+          "option_id": "D",
+          "text": "Continue observing.",
+          "protocol_alignment": "No action on a critical patient",
+          "quality": "critical_error",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "122 -> 134 (up)",
+            "SpO2_percent": "90 -> 82 (down)",
+            "RR_per_min": "28 -> 34 (up)",
+            "BP_mmHg": "128/80 -> 100/64 (down)"
+          },
+          "new_status": "PERI_ARREST",
+          "nurse_response": [
+            "Doctor, she's about to arrest!"
+          ],
+          "next_decision": "D3_CRITICAL"
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 6,
+        "resources_optimal": [
+          "defibrillator_shared",
+          "iv_cannula_kit",
+          "escalation_call"
+        ]
+      }
+    },
+    "D3_RECOVERING": {
+      "patient_id": "P1",
+      "applies_to_status": "RECOVERING",
+      "nurse_dialogue": [
+        "Her pain has eased, Doctor, but she's still not fully stable.",
+        "What would you like to do now?"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Repeat vitals and ECG, confirm cath-lab transfer, and hand over with a clear resource-use summary.",
+          "protocol_alignment": "Completes the reassessment loop with efficient resource use",
+          "quality": "optimal",
+          "resource_use": [
+            "ecg_machine"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "down",
+            "SpO2_percent": "up",
+            "RR_per_min": "down",
+            "BP_mmHg": "stabilizing"
+          },
+          "new_status": "UNSTABLE_RECOVERING",
+          "nurse_response": [
+            "Good, Doctor. She's ready for transfer with a full picture for the cath-lab team."
+          ],
+          "next_decision": "D4_FINAL_MANAGEMENT"
+        },
+        {
+          "option_id": "B",
+          "text": "Move on without repeating any checks.",
+          "protocol_alignment": "Skips reassessment before handover",
+          "quality": "delay",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "up",
+            "SpO2_percent": "down",
+            "RR_per_min": "up",
+            "BP_mmHg": "worsening"
+          },
+          "new_status": "DETERIORATING",
+          "nurse_response": [
+            "Doctor, she's slipping again -- we should have rechecked her."
+          ],
+          "next_decision": "D4_FINAL_MANAGEMENT"
+        },
+        {
+          "option_id": "C",
+          "text": "Order unnecessary repeat imaging 'to be thorough'.",
+          "protocol_alignment": "Late-stage resource waste",
+          "quality": "resource_waste",
+          "resource_use": [
+            "radiology_slot_ct"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "up slightly",
+            "SpO2_percent": "down slightly",
+            "RR_per_min": "up slightly",
+            "BP_mmHg": "unchanged"
+          },
+          "new_status": "DETERIORATING",
+          "nurse_response": [
+            "Doctor, that delayed her transfer and used a slot another patient needed."
+          ],
+          "next_decision": "D4_FINAL_MANAGEMENT"
+        },
+        {
+          "option_id": "D",
+          "text": "Discharge her home now that the pain has eased.",
+          "protocol_alignment": "Unsafe disposition for confirmed ACS awaiting cath-lab",
+          "quality": "critical_error",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "up sharply",
+            "SpO2_percent": "down sharply",
+            "RR_per_min": "up sharply",
+            "BP_mmHg": "dropping"
+          },
+          "new_status": "CRITICAL",
+          "nurse_response": [
+            "Doctor! She's collapsed in the corridor -- she needed to stay!"
+          ],
+          "next_decision": "D4_FINAL_MANAGEMENT"
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 10,
+        "resources_optimal": [
+          "ecg_machine"
+        ]
+      }
+    },
+    "D3_DETERIORATING": {
+      "patient_id": "P1",
+      "applies_to_status": "DETERIORATING",
+      "nurse_dialogue": [
+        "Doctor, she's still deteriorating.",
+        "What do you want to do now?"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Immediately secure IV access, give GTN and aspirin if not already given, and escalate to cath-lab.",
+          "protocol_alignment": "Corrective, resource-appropriate action",
+          "quality": "optimal",
+          "resource_use": [
+            "iv_cannula_kit",
+            "gtn_spray"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "down",
+            "SpO2_percent": "up",
+            "RR_per_min": "down",
+            "BP_mmHg": "improving"
+          },
+          "new_status": "UNSTABLE_RECOVERING",
+          "nurse_response": [
+            "She's responding, Doctor. Still unstable, but improving."
+          ],
+          "next_decision": "D4_FINAL_MANAGEMENT"
+        },
+        {
+          "option_id": "B",
+          "text": "Continue observing without intervening.",
+          "protocol_alignment": "No action",
+          "quality": "critical_error",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "up",
+            "SpO2_percent": "down",
+            "RR_per_min": "up",
+            "BP_mmHg": "worsening"
+          },
+          "new_status": "CRITICAL",
+          "nurse_response": [
+            "Doctor, she's getting worse."
+          ],
+          "next_decision": "D4_FINAL_MANAGEMENT"
+        },
+        {
+          "option_id": "C",
+          "text": "Order more investigations before acting.",
+          "protocol_alignment": "Resource waste and delay",
+          "quality": "resource_waste",
+          "resource_use": [
+            "radiology_slot_ct"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "up",
+            "SpO2_percent": "down",
+            "RR_per_min": "up",
+            "BP_mmHg": "worsening"
+          },
+          "new_status": "CRITICAL",
+          "nurse_response": [
+            "Doctor, she's getting worse."
+          ],
+          "next_decision": "D4_FINAL_MANAGEMENT"
+        },
+        {
+          "option_id": "D",
+          "text": "Send her for a routine ward review before further management.",
+          "protocol_alignment": "Unsafe delay/disposition",
+          "quality": "critical_error",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "up sharply",
+            "SpO2_percent": "down sharply",
+            "RR_per_min": "up sharply",
+            "BP_mmHg": "dropping"
+          },
+          "new_status": "PERI_ARREST",
+          "nurse_response": [
+            "Doctor, she's crashing on the ward!"
+          ],
+          "next_decision": "D4_FINAL_MANAGEMENT"
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 8,
+        "resources_optimal": [
+          "iv_cannula_kit",
+          "gtn_spray"
+        ]
+      }
+    },
+    "D3_CRITICAL": {
+      "patient_id": "P1",
+      "applies_to_status": "CRITICAL",
+      "nurse_dialogue": [
+        "Doctor, this may be our last chance to turn this around."
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Escalate fully with every remaining indicated resource: defibrillator on standby, IV access, senior back-up.",
+          "protocol_alignment": "Correct full escalation under true emergency",
+          "quality": "optimal",
+          "resource_use": [
+            "defibrillator_shared",
+            "iv_cannula_kit",
+            "escalation_call"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "down",
+            "SpO2_percent": "up",
+            "RR_per_min": "down",
+            "BP_mmHg": "improving"
+          },
+          "new_status": "UNSTABLE_RECOVERING",
+          "nurse_response": [
+            "She's responding, Doctor. Still critical, but we have a chance."
+          ],
+          "next_decision": "D4_FINAL_MANAGEMENT"
+        },
+        {
+          "option_id": "B",
+          "text": "Continue current plan without escalating.",
+          "protocol_alignment": "Insufficient response",
+          "quality": "critical_error",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "up",
+            "SpO2_percent": "down",
+            "RR_per_min": "up",
+            "BP_mmHg": "dropping"
+          },
+          "new_status": "PERI_ARREST",
+          "nurse_response": [
+            "Doctor, we're losing her."
+          ],
+          "next_decision": "D4_FINAL_MANAGEMENT"
+        },
+        {
+          "option_id": "C",
+          "text": "Wait for the next observation round.",
+          "protocol_alignment": "No action",
+          "quality": "critical_error",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "up",
+            "SpO2_percent": "down",
+            "RR_per_min": "up",
+            "BP_mmHg": "dropping"
+          },
+          "new_status": "PERI_ARREST",
+          "nurse_response": [
+            "There's no time to wait, Doctor."
+          ],
+          "next_decision": "D4_FINAL_MANAGEMENT"
+        },
+        {
+          "option_id": "D",
+          "text": "Transfer for imaging before intervening.",
+          "protocol_alignment": "Removes critical patient from resuscitation area",
+          "quality": "critical_error",
+          "resource_use": [
+            "radiology_slot_ct"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "up sharply",
+            "SpO2_percent": "down sharply",
+            "RR_per_min": "up sharply",
+            "BP_mmHg": "dropping sharply"
+          },
+          "new_status": "ARREST",
+          "nurse_response": [
+            "Doctor -- she's arrested."
+          ],
+          "next_decision": "D4_FINAL_MANAGEMENT"
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 6,
+        "resources_optimal": [
+          "defibrillator_shared",
+          "iv_cannula_kit",
+          "escalation_call"
+        ]
+      }
+    },
+    "D4_FINAL_MANAGEMENT": {
+      "patient_id": "P1",
+      "applies_to_status": [
+        "UNSTABLE_RECOVERING",
+        "DETERIORATING",
+        "CRITICAL",
+        "PERI_ARREST",
+        "ARREST"
+      ],
+      "recoverability_rule": {
+        "explanation": "Resolves outcome_if_prior_state_recoverable vs outcome_if_prior_state_unrecoverable. Only ARREST (full cardiac arrest already reached before this decision) is unrecoverable -- even the optimal option D4:A cannot guarantee stabilization from ARREST within this simulation. Every other prior status is recoverable: choosing the optimal D4 option resolves it to STABILIZED regardless of how bad the trend was before this final decision.",
+        "unrecoverable_prior_states": [
+          "ARREST"
+        ],
+        "recoverable_prior_states": [
+          "UNSTABLE_RECOVERING",
+          "DETERIORATING",
+          "CRITICAL",
+          "PERI_ARREST"
+        ]
+      },
+      "nurse_dialogue_by_state": {
+        "UNSTABLE_RECOVERING": [
+          "Doctor, she's improving but still unstable.",
+          "What's your final plan?"
+        ],
+        "DETERIORATING": [
+          "Doctor, she still hasn't turned the corner."
+        ],
+        "CRITICAL": [
+          "Doctor, this is our last opportunity."
+        ],
+        "PERI_ARREST": [
+          "Doctor, she's peri-arrest -- we need definitive action now."
+        ],
+        "ARREST": [
+          "Doctor, she has arrested. We need to begin resuscitation immediately."
+        ]
+      },
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Finalize cath-lab handover with a concise resource-use summary, keep her on monitoring until transfer.",
+          "protocol_alignment": "Efficient, protocol-consistent disposition",
+          "quality": "optimal",
+          "resource_use": [
+            "monitor"
+          ],
+          "outcome_if_prior_state_recoverable": "STABILIZED",
+          "outcome_if_prior_state_unrecoverable": "CRITICAL_ENDPOINT",
+          "nurse_response_success": [
+            "She's stabilized, Doctor, and the cath-lab team is ready for her."
+          ],
+          "nurse_response_failure": [
+            "Doctor, despite our interventions, we were unable to stabilize the patient."
+          ]
+        },
+        {
+          "option_id": "B",
+          "text": "Send her home once pain-free, without cath-lab follow-up.",
+          "protocol_alignment": "Unsafe disposition, ignores confirmed ACS",
+          "quality": "critical_error",
+          "resource_use": [],
+          "outcome_if_prior_state_recoverable": "CRITICAL_ENDPOINT",
+          "outcome_if_prior_state_unrecoverable": "CRITICAL_ENDPOINT",
+          "nurse_response_failure": [
+            "Doctor, she should never have been sent home without follow-up."
+          ]
+        },
+        {
+          "option_id": "C",
+          "text": "Leave her on the ward with no clear plan.",
+          "protocol_alignment": "No management plan",
+          "quality": "delay",
+          "resource_use": [],
+          "outcome_if_prior_state_recoverable": "PARTIAL_STABILIZATION",
+          "outcome_if_prior_state_unrecoverable": "CRITICAL_ENDPOINT",
+          "nurse_response_partial": [
+            "She's holding steady, Doctor, but there's no real plan in place."
+          ],
+          "nurse_response_failure": [
+            "Doctor, despite our interventions, we were unable to stabilize the patient."
+          ]
+        },
+        {
+          "option_id": "D",
+          "text": "Order one more unnecessary set of investigations before finalizing anything.",
+          "protocol_alignment": "Late resource waste and delay",
+          "quality": "resource_waste",
+          "resource_use": [
+            "radiology_slot_ct"
+          ],
+          "outcome_if_prior_state_recoverable": "CRITICAL_ENDPOINT",
+          "outcome_if_prior_state_unrecoverable": "CRITICAL_ENDPOINT",
+          "nurse_response_failure": [
+            "Doctor, that delay cost us -- we couldn't stabilize her in time."
+          ]
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 10,
+        "resources_optimal": [
+          "monitor"
+        ]
+      }
+    }
+  },
+  "flow_control": {
+    "explanation": "Single-patient level. Every option's next_decision points only to another node for the same patient (P1), never elsewhere. The engine moves forward strictly by following the next_decision chosen by the player's selected option -- D1_INITIAL_RESPONSE -> D2_* (state-dependent) -> D3_* (state-dependent) -> D4_FINAL_MANAGEMENT -> ending. There is no next patient in this level.",
+    "sequence": [
+      {
+        "step": 1,
+        "node": "D1_INITIAL_RESPONSE",
+        "patient_id": "P1",
+        "on_complete": "level complete once D4_FINAL_MANAGEMENT resolves to an ending in endings{}"
+      }
+    ]
+  },
+  "endings": {
+    "STABILIZED": {
+      "status_code": "SUCCESS",
+      "banner": "MISSION COMPLETE - PATIENT STABILIZED",
+      "nurse_dialogue": [
+        "She's stabilized, Doctor, and ready for cath-lab transfer."
+      ]
+    },
+    "PARTIAL_STABILIZATION": {
+      "status_code": "SUCCESS_WITH_PENALTY",
+      "banner": "MISSION COMPLETE - PATIENT STABILIZED (RESOURCE-INEFFICIENT)",
+      "nurse_dialogue": [
+        "She pulled through, Doctor, but we used up supplies the next patient needed."
+      ]
+    },
+    "CRITICAL_ENDPOINT": {
+      "status_code": "FAILURE",
+      "banner": "UNSUCCESSFUL OUTCOME",
+      "nurse_dialogue": [
+        "Doctor, despite our interventions, we were unable to stabilize the patient."
+      ],
+      "screen_text": "The patient could not be stabilized within this simulation."
+    }
+  },
+  "performance_report_schema": {
+    "decision_history": [
+      {
+        "decision_id": "string",
+        "action_text": "string",
+        "quality": "optimal|delay|resource_waste|critical_error",
+        "patient_status_before": "string",
+        "patient_status_after": "string",
+        "time_taken_seconds": "number (runtime)",
+        "expected_seconds": "number (authored)",
+        "resources_used": "array (runtime)",
+        "resources_optimal": "array (authored)"
+      }
+    ],
+    "final_outcome": "STABILIZED | PARTIAL_STABILIZATION | CRITICAL_ENDPOINT",
+    "resource_summary": {
+      "total_units_available": "sum of resource_pool_at_level_start",
+      "total_units_consumed": "runtime",
+      "units_wasted": "runtime - resources spent on resource_waste-tagged options"
+    },
+    "score_components": [
+      "decision_quality",
+      "response_time",
+      "resource_efficiency",
+      "protocol_adherence_esi"
+    ]
+  }
+}

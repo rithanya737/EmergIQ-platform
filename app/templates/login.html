@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}EMERGIQ — {{ 'Sign Up' if mode == 'register' else 'Login' }}{% endblock %}
+
+{% block content %}
+<div class="auth">
+  <div class="authcard">
+    <div style="text-align:center;margin-bottom:26px">
+      <a class="brand" href="{{ url_for('dashboard.index') }}" style="justify-content:center;font-size:22px"><img src="{{ url_for('static', filename='media/logo.png') }}" alt="EMERGIQ logo" style="width:34px;height:34px">EMERGIQ</a>
+      <p class="tagline" style="margin:10px 0 0">&ldquo;Practice the Pressure. Master the Decision.&rdquo;</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <p class="err on" role="alert">{{ message }}</p>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% if mode == 'register' %}
+    <form class="card" method="post" action="{{ url_for('auth.login') }}">
+      <input type="hidden" name="mode" value="register">
+      <h2 style="font-size:15px;letter-spacing:.24em;text-transform:uppercase;margin-bottom:18px">Sign Up</h2>
+      <label class="field"><span>Full name</span><input type="text" name="name" placeholder="Your full name" required autocomplete="name" maxlength="80"></label>
+      <label class="field"><span>Email</span><input type="email" name="email" placeholder="Email address" required autocomplete="email"></label>
+      <label class="field"><span>Password</span><input type="password" name="password" placeholder="Password" required minlength="6" autocomplete="new-password"></label>
+      <button class="btn btn-primary" type="submit" style="width:100%;margin-top:8px">Sign Up</button>
+      <p style="text-align:center;margin:16px 0 0;color:var(--muted);font-size:13px">
+        Already have an account?
+        <a class="btn btn-quiet btn-sm" href="{{ url_for('auth.login', mode='login') }}" style="text-transform:none;letter-spacing:.04em">Login</a>
+      </p>
+    </form>
+    {% else %}
+    <form class="card" method="post" action="{{ url_for('auth.login') }}">
+      <input type="hidden" name="mode" value="login">
+      <h2 style="font-size:15px;letter-spacing:.24em;text-transform:uppercase;margin-bottom:18px">Login</h2>
+      <label class="field"><span>Email</span><input type="email" name="email" placeholder="Email address" required autocomplete="email"></label>
+      <label class="field"><span>Password</span><input type="password" name="password" placeholder="Password" required autocomplete="current-password"></label>
+      <button class="btn btn-primary" type="submit" style="width:100%;margin-top:8px">Login</button>
+      <p style="text-align:center;margin:16px 0 0;color:var(--muted);font-size:13px">
+        New to EMERGIQ?
+        <a class="btn btn-quiet btn-sm" href="{{ url_for('auth.login', mode='register') }}" style="text-transform:none;letter-spacing:.04em">Sign Up</a>
+      </p>
+    </form>
+    {% endif %}
+
+    <p class="protonote" style="text-align:center;border:none">Every registered account is the same &mdash; self learn, create a room, or join an assessment.</p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+{
+  "protocol": "Emergency Severity Index (ESI) - 5-level triage",
+  "purpose": "Algorithm used in emergency departments to prioritize patients by acuity and anticipated resource needs, not just diagnosis.",
+  "levels": [
+    {"level": 1, "name": "Resuscitation", "criteria": "Requires immediate lifesaving intervention: unresponsive/cannot follow commands, ineffective airway, SpO2 < 90% with respiratory compromise, hemodynamic instability with hypoperfusion, severe brady/tachycardia, or cardiac/pulmonary arrest."},
+    {"level": 2, "name": "Emergent", "criteria": "High-risk situation (threat to life, limb, sight, or organ function), acute change in mental status, or severe pain/distress (>=7/10). Examples: possible ACS, stroke symptoms, severe hemorrhage, suicidal/homicidal ideation."},
+    {"level": 3, "name": "Urgent", "criteria": "Stable, but needs two or more different resource types to reach a disposition (e.g. labs, imaging, IV fluids, specialty consult)."},
+    {"level": 4, "name": "Less Urgent", "criteria": "Stable, needs exactly one resource (e.g. a single lab test, a simple wound repair)."},
+    {"level": 5, "name": "Non-Urgent", "criteria": "Stable, needs no resources (e.g. prescription refill, immunization only)."}
+  ],
+  "vital_sign_uptriage": "For an ESI-3 adult patient, danger-zone vital signs (heart rate > 100, respiratory rate > 20, SpO2 < 92%) should prompt consideration of uptriage to ESI-2, accounting for medications and chronic conditions that can blunt compensatory responses.",
+  "_sources": [
+    {"title": "Emergency Severity Index Handbook, 5th Edition (Agency for Healthcare Research and Quality / ACEP)", "url": "https://media.emscimprovement.center/documents/Emergency_Severity_Index_Handbook.pdf"}
+  ]
+}

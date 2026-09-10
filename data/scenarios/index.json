@@ -1,0 +1,115 @@
+{
+  "game": "EmergIQ",
+  "description": "Fake/fictional emergency-medicine training scenarios for the EmergIQ game, generated for simulation and frontend/game-engine integration purposes. All patient data is entirely fictional.",
+  "reference_material_mapping": [
+    {
+      "file": "start_triage.json",
+      "attribution": "MCI Triage (START algorithm)",
+      "used_in_levels": [
+        4,
+        5
+      ]
+    },
+    {
+      "file": "national_trauma_triage_protocol.json",
+      "attribution": "CDC MMWR Guidelines for Field Triage of Injured Patients",
+      "used_in_levels": [
+        4,
+        5
+      ]
+    },
+    {
+      "file": "esi_levels.json",
+      "attribution": "AHRQ ESI Handbook",
+      "used_in_levels": [
+        2,
+        3,
+        5
+      ]
+    },
+    {
+      "file": "abcde_sequence.json",
+      "attribution": "Resuscitation Council UK",
+      "used_in_levels": [
+        1
+      ]
+    },
+    {
+      "file": "biomedical_ethics_principles.json",
+      "attribution": "1000-Word Philosophy + PMC (four principles: autonomy, beneficence, non-maleficence, justice)",
+      "used_in_levels": [
+        5
+      ]
+    }
+  ],
+  "levels": [
+    {
+      "level_id": 1,
+      "name": "First Response",
+      "difficulty": "Easy",
+      "patient_count": 1,
+      "file": "level1_first_response.json"
+    },
+    {
+      "level_id": 2,
+      "name": "Resource Under Pressure",
+      "difficulty": "Medium",
+      "patient_count": 1,
+      "file": "level2_resource_pressure.json"
+    },
+    {
+      "level_id": 3,
+      "name": "Priority Decision",
+      "difficulty": "Medium-Hard",
+      "patient_count": 2,
+      "file": "level3_priority_decision.json"
+    },
+    {
+      "level_id": 4,
+      "name": "Mass Casualty",
+      "difficulty": "Hard",
+      "patient_count": 6,
+      "file": "level4_mass_casualty.json"
+    },
+    {
+      "level_id": 5,
+      "name": "Critical Overload",
+      "difficulty": "Very Hard",
+      "patient_count": 6,
+      "file": "level5_critical_overload.json"
+    }
+  ],
+  "shared_schema_notes": {
+    "status_values": [
+      "AT_RISK",
+      "AT_RISK_IMPROVING",
+      "DETERIORATING",
+      "RECOVERING",
+      "UNSTABLE_RECOVERING",
+      "CRITICAL",
+      "PERI_ARREST",
+      "ARREST",
+      "STABILIZED",
+      "STABLE_PAINFUL",
+      "STABLE_TREATED",
+      "STABLE_UNTREATED",
+      "PARTIAL_STABILIZATION",
+      "CRITICAL_ENDPOINT"
+    ],
+    "quality_values": [
+      "optimal",
+      "delay",
+      "resource_waste",
+      "suboptimal_ethics",
+      "critical_error"
+    ],
+    "decision_node_shape": {
+      "nurse_dialogue": "array of strings, spoken before options are presented",
+      "options": "array of 4 branches (A-D), each with text, quality, vitals_delta, new_status, nurse_response, next_decision",
+      "evaluator": "authored fields (expected_seconds, resources_optimal) the game engine compares against runtime play (time_taken_seconds, resources_used) for scoring"
+    },
+    "flask_integration_hint": "Each level file is a self-contained JSON document intended to be served as-is (e.g. GET /api/levels/<level_id>) and consumed by the frontend/game engine to drive the branching dialogue and HUD. decision_tree keys are stable node IDs; next_decision fields point to the next key to render, keyed by the resulting patient status where a level has state-dependent branching.",
+    "flow_control_rule": "Every level file now includes a top-level flow_control block. Rule: an option's next_decision field NEVER jumps to a different patient's chain -- it only ever points to another node in the SAME patient's chain, or is null when that patient's chain is complete (see chain_status / chain_terminal_node). Movement to the NEXT PATIENT is controlled exclusively by flow_control.sequence, which the game engine steps through once the current patient's chain hits a terminal node. This keeps 'move to the next decision based on the player's choice' (within a patient) strictly separate from 'move to the next patient' (an engine-level sequencing step, not a decision consequence).",
+    "death_and_failure_rule": "A patient's fate is decided by the QUALITY of their final decision node, not simply by how bad their vitals got earlier -- a player who made early mistakes can still save the patient by choosing the optimal option at the final decision (see Level 1 endings.example_player_trajectories.player_B_mistake_then_recovers). The exception is reaching a true ARREST status before that final decision: each affected node carries a recoverability_rule object listing which prior statuses are unrecoverable (always just ['ARREST']) vs recoverable. From ARREST, even the optimal final option resolves to a *_CRITICAL_ENDPOINT / FAILURE outcome -- this is the game's genuine death path, reachable only through a specific chain of repeated critical_error choices (traced in each affected node's recoverability_rule.explanation). In single-patient levels (1, 2), reaching this endpoint ends the level immediately in FAILURE. In multi-patient levels (3, 4, 5), one patient's death does NOT stop the level -- flow_control still advances to the remaining patients, and the death is folded into the overall level outcome at the end (see each file's endings.*_outcome_logic)."
+  }
+}

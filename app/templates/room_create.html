@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}EMERGIQ — Create Room{% endblock %}
+{% block content %}
+<div class="wrap page" style="max-width:760px">
+  <span class="eyebrow">Create Room</span>
+  <h1 class="ptt" style="margin:8px 0 6px">Set up your assessment</h1>
+  <p class="muted" style="margin-bottom:24px">You will become the Host of this room.</p>
+  <form class="card" method="POST" id="crForm" novalidate>
+    <label class="field"><span>Room name</span><input type="text" name="name" placeholder="Assessment name" maxlength="80" required value="{{ form.get('name','') }}"></label>
+    <div class="grid2">
+      <label class="field"><span>Participant limit</span><input type="number" name="participant_limit" min="1" max="200" placeholder="Number of participants" required value="{{ form.get('participant_limit','') }}"></label>
+      <label class="field"><span>Difficulty</span>
+        <select name="difficulty" id="crDiff" required>
+          <option value="">Choose a difficulty</option>
+          {% for d in difficulties %}
+            <option value="{{ d }}" {{ 'selected' if form.get('difficulty') == d }}>{{ d|capitalize }}</option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+
+    <span class="field"><span>Select levels</span></span>
+    <p class="muted" style="font-size:12.5px;margin:-6px 0 10px">Choose a difficulty above to see which levels match it, then tick every level this assessment should cover.</p>
+    <div id="crLevels" style="display:flex;flex-direction:column;gap:8px;margin-bottom:6px">
+      {% for lv in levels %}
+        <label class="crlevel" data-difficulty="{{ lv.difficulty }}" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line-2, rgba(255,255,255,.14));border-radius:10px">
+          <input type="checkbox" name="levels" value="{{ lv.level }}" {{ 'checked' if lv.level|string in form.getlist('levels') }}>
+          <span>Level {{ '%02d'|format(lv.level) }} &mdash; {{ lv.title }} <span class="muted" style="font-size:12px">({{ lv.difficulty|capitalize }})</span></span>
+        </label>
+      {% endfor %}
+    </div>
+    <p class="muted" id="crNoMatch" style="font-size:12.5px;margin:0 0 18px" hidden>No levels match that difficulty yet — choose another, or tick from the full list above.</p>
+
+    <div class="grid2">
+      <label class="field"><span>Assessment from</span><input type="date" name="from_date" min="{{ today }}" required value="{{ form.get('from_date','') }}"></label>
+      <label class="field"><span>Assessment to</span><input type="date" name="to_date" min="{{ today }}" required value="{{ form.get('to_date','') }}"></label>
+    </div>
+    {% if error %}<p class="err" role="alert">{{ error }}</p>{% endif %}
+    <p class="muted" style="font-size:12.5px;margin:4px 0 18px">Maximum assessment duration is {{ max_days }} days. Room history is removed permanently when the assessment expires.</p>
+    <button class="btn btn-primary" type="submit" style="width:100%">Create Room</button>
+  </form>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+(function () {
+  var diff = document.getElementById("crDiff");
+  var rows = Array.prototype.slice.call(document.querySelectorAll("#crLevels .crlevel"));
+  var noMatch = document.getElementById("crNoMatch");
+  function apply() {
+    var chosen = diff.value;
+    var visible = 0;
+    rows.forEach(function (row) {
+      var match = !chosen || row.getAttribute("data-difficulty") === chosen;
+      row.hidden = !match;
+      if (!match) row.querySelector("input").checked = false;
+      else visible += 1;
+    });
+    noMatch.hidden = !chosen || visible > 0;
+  }
+  diff.addEventListener("change", apply);
+  apply();
+})();
+</script>
+{% endblock %}

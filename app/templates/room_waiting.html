@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}EMERGIQ — {{ room.name }}{% endblock %}
+{% block content %}
+<div class="wrap page" id="roomRoot" data-code="{{ room.code }}">
+  {% if room.expiring_soon %}
+  <div class="alert">
+    <span style="font-size:20px" aria-hidden="true">&#9888;</span>
+    <div>
+      <h4>Assessment expiring soon</h4>
+      <p style="margin:0;font-size:14px">This assessment will expire on <b>{{ room.to_date.strftime('%d %b %Y') }}</b>. The history of the assessment will be removed permanently.</p>
+      <p style="margin:6px 0 0;font-size:12.5px;color:var(--muted)">Self-learning history is not affected.</p>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="sechead" style="margin-top:14px">
+    <div>
+      <span class="eyebrow">{{ 'Host waiting room' if room.status == 'waiting' else 'Assessment in progress' }}</span>
+      <h1 class="ptt" style="margin-top:8px">{{ room.name }}</h1>
+      <p class="muted" style="margin-top:6px">{{ level_summary|join(', ') }} &middot; {{ room.difficulty|capitalize }} &middot;
+        {{ room.from_date.strftime('%d %b') if room.from_date }} &ndash; {{ room.to_date.strftime('%d %b %Y') if room.to_date }} ({{ room.window_days }} day{{ 's' if room.window_days != 1 }})</p>
+    </div>
+    <div style="min-width:260px">
+      <span class="eyebrow q" style="display:block;margin-bottom:8px">Room code</span>
+      <div class="codebox">{{ room.code }}</div>
+    </div>
+  </div>
+
+  <div class="grid2" style="align-items:start;margin-top:18px">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap">
+        <span class="eyebrow q">Participants</span>
+        <span class="pill {{ 'ok' if participant_count else 'warn' }}" id="rStatus">{{ 'Participants joining' if participant_count else 'Waiting for participants' }}</span>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:8px">
+        <span class="mono" style="font-size:44px;font-weight:600" id="rCount">{{ participant_count }}</span>
+        <span class="muted mono">/ {{ room.participant_limit }}</span>
+      </div>
+      <div class="bar" style="margin:14px 0 18px"><i id="rBar" style="width:{{ (participant_count / room.participant_limit * 100) if room.participant_limit else 0 }}%"></i></div>
+      <div id="rList">
+        {% if members %}
+          {% for m in members %}<div class="stat"><span class="k">{{ loop.index }}. {{ m.user.name }}</span><span class="v">{{ 'Finished' if m.finished_at else (m.levels_completed()|length ~ ' / ' ~ room.level_set|length ~ ' levels') }}</span></div>{% endfor %}
+        {% else %}
+          <div class="empty"><div class="big">Waiting for participants&hellip;</div>No participants have joined yet.</div>
+        {% endif %}
+      </div>
+      <div class="actions" style="margin-top:16px">
+        {% if room.status == 'waiting' %}
+          <form method="POST" action="{{ url_for('rooms.start_room', code=room.code) }}" style="display:inline-block">
+            <button class="btn btn-primary btn-sm" type="submit" {{ 'disabled' if not participant_count or not room.window_open }}>Start Assessment</button>
+          </form>
+          <form method="POST" action="{{ url_for('rooms.close_room', code=room.code) }}" style="display:inline-block" onsubmit="return confirm('Close this room? Participants will no longer be able to join.');">
+            <button class="btn btn-danger btn-sm" type="submit">Close Room</button>
+          </form>
+        {% elif room.status == 'active' %}
+          <form method="POST" action="{{ url_for('rooms.end_room', code=room.code) }}" style="display:inline-block" onsubmit="return confirm('End the assessment now? Participants still in progress will be recorded as incomplete.');">
+            <button class="btn btn-ghost btn-sm" type="submit">End Assessment</button>
+          </form>
+        {% endif %}
+      </div>
+      <p class="protonote" id="rHint">
+        {% if room.status == 'waiting' %}
+          {% if not room.window_open %}The assessment window opens on {{ room.from_date.strftime('%d %b %Y') if room.from_date }}. You can start it from then.
+          {% elif participant_count %}Start the assessment when your participants are ready.
+          {% else %}Share the room code. Participants appear here as they join.{% endif %}
+        {% else %}Participants can enter now. End the assessment once everyone has finished.{% endif %}
+      </p>
+    </div>
+
+    <div class="card">
+      <span class="eyebrow q">{{ 'Live leaderboard' if room.status == 'active' else 'Leaderboard' }}</span>
+      <div style="margin-top:14px">
+        {% if members %}
+          <div class="tablewrap"><table><thead><tr><th>#</th><th>Learner</th><th>Status</th></tr></thead><tbody>
+          {% for m in members %}<tr><td class="rank">{{ loop.index }}</td><td>{{ m.user.name }}</td><td><span class="pill {{ 'ok' if m.finished_at else 'warn' }}">{{ 'Finished' if m.finished_at else 'In progress' }}</span></td></tr>{% endfor %}
+          </tbody></table></div>
+        {% else %}
+          <div class="empty"><div class="big">Waiting for participants&hellip;</div>The leaderboard appears once a participant joins.</div>
+        {% endif %}
+        <div class="actions" style="margin-top:14px">
+          <a class="btn btn-ghost btn-sm" href="{{ url_for('rooms.room_leaderboard', code=room.code) }}">Open Leaderboard</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/room_waiting.js') }}"></script>{% endblock %}

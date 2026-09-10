@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}EMERGIQ — Self Learning{% endblock %}
+
+{% block content %}
+<div class="wrap page">
+  <span class="eyebrow">Self Learning</span>
+  <div class="sechead" style="margin-top:8px">
+    <div>
+      <h1 class="ptt">Level map</h1>
+      <p class="muted" style="margin-top:6px">Your performance here is yours alone &mdash; no leaderboard, no ranking.</p>
+    </div>
+    <div class="card" style="padding:16px 20px;min-width:270px">
+      <span class="eyebrow q">Self learning performance</span>
+      <div class="stat"><span class="k">Latest score</span><span class="v">{{ latest_score if latest_score is not none else '—' }}</span></div>
+      <div class="stat"><span class="k">Best score</span><span class="v">{{ best_score if best_score is not none else '—' }}</span></div>
+      <div class="stat"><span class="k">Levels completed</span><span class="v">{{ completed_count }} / {{ levels|length }}</span></div>
+    </div>
+  </div>
+
+  <div class="levelgrid">
+    {% for lv in levels %}
+      {% if lv.status == 'locked' %}
+        <div class="lvl locked">
+          <span class="mark lockmark" aria-hidden="true">&#128274;</span>
+          <div class="num">LEVEL {{ '%02d'|format(lv.level_id) }}</div>
+          <div class="nm">{{ lv.title }}</div>
+          <div class="lvlfoot">{{ lv.difficulty }} &middot; Locked</div>
+        </div>
+      {% else %}
+        <a class="lvl{{ ' current' if lv.is_current }}{{ ' done' if lv.status == 'completed' }}{{ ' retry' if lv.needs_retry }}" href="{{ url_for('game.play_level', level=lv.level_id) }}">
+          {% if lv.status == 'completed' %}<span class="mark donemark" aria-hidden="true">&#10003;</span>{% endif %}
+          <div class="num">LEVEL {{ '%02d'|format(lv.level_id) }}</div>
+          <div class="nm">{{ lv.title }}</div>
+          <div class="lvlfoot">
+            {{ lv.difficulty }}
+            {%- if lv.status == 'completed' %} &middot; Best: {{ lv.best_score }}
+            {%- elif lv.needs_retry %} &middot; Best: {{ lv.best_score }} &mdash; Retry, need {{ pass_threshold }}+ to advance
+            {%- elif lv.is_current %} &middot; Continue{% endif %}
+          </div>
+        </a>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+{
+  "protocol": "ABCDE Primary Survey",
+  "purpose": "Standard sequence for assessing and stabilizing a critically ill or injured patient: treat life-threatening problems before moving to the next letter, and reassess continuously.",
+  "sequence": [
+    {"step": "A", "name": "Airway", "action": "Look for airway obstruction (paradoxical chest movement, accessory muscle use, cyanosis, noisy breathing). Get expert help immediately if obstructed; use positioning, suction, or an airway adjunct; give high-concentration oxygen."},
+    {"step": "B", "name": "Breathing", "action": "Count respiratory rate (normal 12-20/min; >25/min is concerning), assess effort/symmetry, auscultate and percuss the chest, check SpO2. Give oxygen to all critically ill patients; consider bag-mask or non-invasive ventilation if breathing is inadequate."},
+    {"step": "C", "name": "Circulation", "action": "Check skin colour/temperature, capillary refill (normal <2 sec), pulse rate/quality, blood pressure; look for external and concealed bleeding. Insert large-bore IV access, send bloods, give a fluid bolus if hypotensive, and control any hemorrhage."},
+    {"step": "D", "name": "Disability", "action": "Only after A, B, C are addressed: check pupils, assess conscious level (ACVPU or GCS), and check blood glucose. Treat reversible causes (e.g. naloxone for opioid toxicity, glucose for hypoglycemia)."},
+    {"step": "E", "name": "Exposure", "action": "Fully expose the patient to look for injuries or rashes while preserving dignity and preventing heat loss."}
+  ],
+  "rule": "Treat life-threatening problems at each step before moving to the next. Reassess from A if the patient deteriorates. Call for expert help early and communicate findings clearly (e.g. SBAR).",
+  "_sources": [
+    {"title": "The ABCDE Approach - Resuscitation Council UK", "url": "https://www.resus.org.uk/library/abcde-approach"}
+  ]
+}

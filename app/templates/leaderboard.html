@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}EMERGIQ — {{ room.name }}{% endblock %}
+
+{% block content %}
+<div class="wrap page">
+  <div class="sechead" style="margin-top:0">
+    <div>
+      <span class="eyebrow">Assessment room</span>
+      <h1 class="ptt" style="margin-top:8px">{{ room.name }}</h1>
+      <p class="muted" style="margin-top:6px">Difficulty: {{ room.difficulty }} &middot; Levels: {{ room.level_set|join(', ') }}</p>
+    </div>
+    <div style="min-width:260px">
+      <span class="eyebrow q" style="display:block;margin-bottom:8px">Room code</span>
+      <div class="codebox">{{ room.code }}</div>
+    </div>
+  </div>
+
+  {% if current_user.id == room.instructor_id %}
+    <p class="protonote">Share the room code above with learners so they can join.</p>
+  {% endif %}
+
+  <div class="card" style="padding:8px 10px;margin-top:18px">
+    {% if not members %}
+      <div class="empty"><div class="big">No one has joined this room yet.</div></div>
+    {% else %}
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr><th>#</th><th>Learner</th><th>Levels completed</th><th>Status</th><th></th></tr>
+          </thead>
+          <tbody>
+            {% for member in members %}
+              <tr class="{{ 'you' if member.user_id == current_user.id }}">
+                <td class="rank">{{ loop.index }}</td>
+                <td>{{ member.user.name }}</td>
+                <td class="mono">{{ member.levels_completed()|length }} / {{ room.level_set|length }}</td>
+                <td>
+                  {% if member.finished_at %}
+                    <span class="pill ok">Finished</span>
+                  {% else %}
+                    <span class="pill warn">In progress</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if member.finished_at %}
+                    <a class="btn btn-ghost btn-sm" href="{{ url_for('rooms.room_report', code=room.code) if member.user_id == current_user.id else url_for('rooms.room_report_for_learner', code=room.code, user_id=member.user_id) }}">View report</a>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{
+  "protocol": "National Trauma Triage Protocol (CDC Field Triage Guidelines)",
+  "purpose": "A 4-step field decision scheme used by EMS to decide which injured patients need transport to a trauma center.",
+  "steps": [
+    "Step 1 - Physiologic criteria: Measure vital signs and level of consciousness. Glasgow Coma Scale < 14, or systolic blood pressure < 90 mmHg, or respiratory rate < 10 or > 29 breaths/minute triggers transport to a trauma center.",
+    "Step 2 - Anatomic criteria: Assess anatomy of injury - penetrating injuries to head/neck/torso/proximal extremities, flail chest, crush/degloving/amputation injuries, pelvic fractures, paralysis, or two or more long-bone fractures trigger transport to a trauma center.",
+    "Step 3 - Mechanism of injury: Evaluate high-energy mechanisms - falls from height, high-risk auto crashes, pedestrian/bicycle struck, or motorcycle crash > 20 mph.",
+    "Step 4 - Special patient/system considerations: Consider age 55+, anticoagulant use, burns, end-stage renal disease, pregnancy > 20 weeks, or EMS provider judgment; when in doubt, transport to a trauma center."
+  ],
+  "_sources": [
+    {"title": "Guidelines for Field Triage of Injured Patients (CDC MMWR)", "url": "https://www.cdc.gov/mmwr/preview/mmwrhtml/rr6101a1.htm"}
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "protocol": "Four Principles of Biomedical Ethics (Beauchamp & Childress)",
+  "purpose": "The four widely-used principles for reasoning through ethical dilemmas in clinical decision-making; none is ranked above the others, and conflicts (e.g. autonomy vs. beneficence) must be balanced case by case.",
+  "criteria": [
+    {"criterion": "Respect for autonomy", "description": "Honor a patient's capacity to make their own healthcare decisions - their understanding of diagnosis, risks, benefits, and their right to consent or refuse treatment."},
+    {"criterion": "Non-maleficence", "description": "'First, do no harm' - avoid actions that injure or otherwise harm the patient during care."},
+    {"criterion": "Beneficence", "description": "Actively act in the patient's best interest and promote their wellbeing - 'cure sometimes, treat often, comfort always.'"},
+    {"criterion": "Justice", "description": "Distribute healthcare benefits, risks, and costs fairly - equitable access and treatment across patients and populations."}
+  ],
+  "_sources": [
+    {"title": "Principlism in Biomedical Ethics: Respect for Autonomy, Non-Maleficence, Beneficence, and Justice - 1000-Word Philosophy", "url": "https://1000wordphilosophy.com/2021/02/16/principlism-in-biomedical-ethics/"},
+    {"title": "Principles of Clinical Ethics and Their Application to Practice - PMC, NIH", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7923912/"}
+  ]
+}

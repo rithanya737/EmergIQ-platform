@@ -1,0 +1,799 @@
+{
+  "level_id": 5,
+  "level_name": "Critical Overload",
+  "codename": "EmergIQ - Critical Overload",
+  "difficulty": "Very Hard",
+  "patient_count": 6,
+  "main_skill": "Manage multiple patients with very limited resources under ethical pressure",
+  "core_question": "Who needs attention first, and how can I manage everyone with very limited resources?",
+  "protocol_reference": [
+    {
+      "primary_source": "start_triage.json",
+      "attribution": "MCI Triage (START algorithm)",
+      "usage_note": "Underlying triage categories carry over from mass-casualty logic."
+    },
+    {
+      "primary_source": "national_trauma_triage_protocol.json",
+      "attribution": "CDC MMWR Guidelines for Field Triage of Injured Patients",
+      "usage_note": "Physiologic-severity-based treatment ordering."
+    },
+    {
+      "primary_source": "esi_levels.json",
+      "attribution": "AHRQ ESI Handbook",
+      "usage_note": "Resource-need-based acuity for the lower-severity patients in this level."
+    },
+    {
+      "primary_source": "biomedical_ethics_principles.json",
+      "attribution": "1000-Word Philosophy and PMC (four principles of biomedical ethics)",
+      "usage_note": "The two scarce-resource allocation decisions (VENTILATOR_ALLOCATION and OR_ALLOCATION) are explicitly tagged against the four principles: autonomy, beneficence, non-maleficence, and justice. The optimal option in each case applies justice/utility (allocate the scarce resource to maximize salvageable lives) balanced with beneficence and non-maleficence, consistent with standard crisis-standards-of-care ethics used in disaster medicine."
+    }
+  ],
+  "note": "All names, vitals, and clinical details below are entirely fictional training content generated for simulation purposes. This scenario depicts a fictional building-fire mass-casualty incident with severely constrained hospital resources, for emergency-ethics and triage training only.",
+  "scope_note": "As with Level 4, each patient carries one condensed management decision rather than a 4-step tree, to keep the level playable under the intended time pressure. The two resource-allocation decisions (ventilator, OR/surgeon) are the level's centerpiece and are fully branched with explicit ethical-principle tagging.",
+  "resource_pool_at_level_start": {
+    "ventilators": 1,
+    "operating_rooms": 1,
+    "surgeons_available": 1,
+    "blood_units": 2,
+    "oxygen_cylinders": 1,
+    "icu_beds": 1
+  },
+  "intro_sequence": {
+    "phase_1_nurse_intro": {
+      "character": "Nurse Maya",
+      "dialogue": [
+        "Doctor, we have a second wave from the apartment fire -- six more patients, and we're already stretched thin.",
+        "We have exactly one ventilator, one operating room with one surgeon, two units of blood, one spare oxygen cylinder, and one ICU bed left for the rest of the shift.",
+        "Some of these decisions won't have a clean answer. I need you to make the call."
+      ]
+    }
+  },
+  "patients": [
+    {
+      "patient_id": "P1",
+      "name": "Kabir Anand",
+      "age": 40,
+      "sex": "Male",
+      "chief_complaint": "Severe smoke inhalation, singed airway, in reversible respiratory failure",
+      "medical_report": {
+        "patient_id": "RKEMC-2026-CO-01",
+        "name": "Kabir Anand",
+        "age": 40,
+        "sex": "Male",
+        "blood_group": "A+",
+        "known_allergies": "None reported",
+        "past_medical_history": "Nil significant, previously fit and well",
+        "vitals_on_arrival": {
+          "HR_bpm": 128,
+          "SpO2_percent": 79,
+          "RR_per_min": 34,
+          "BP_mmHg": "102/64",
+          "GCS": "13/15"
+        },
+        "injury_summary": "Severe smoke inhalation with singed nasal hair and soot in airway, hypoxic respiratory failure, otherwise structurally healthy lungs and heart -- high likelihood of full recovery if ventilated promptly",
+        "prognosis_with_ventilation": "Good - reversible injury, expected to wean within days",
+        "prognosis_without_ventilation": "Poor - likely progression to respiratory arrest within the hour"
+      }
+    },
+    {
+      "patient_id": "P2",
+      "name": "Meenu Bhatt",
+      "age": 70,
+      "sex": "Female",
+      "chief_complaint": "Severe smoke inhalation with extensive full-thickness burns to chest and airway",
+      "medical_report": {
+        "patient_id": "RKEMC-2026-CO-02",
+        "name": "Meenu Bhatt",
+        "age": 70,
+        "sex": "Female",
+        "blood_group": "B+",
+        "known_allergies": "Unknown",
+        "past_medical_history": "Longstanding severe lung disease (details unknown, family not yet contactable)",
+        "vitals_on_arrival": {
+          "HR_bpm": 132,
+          "SpO2_percent": 74,
+          "RR_per_min": 36,
+          "BP_mmHg": "88/54",
+          "GCS": "11/15"
+        },
+        "injury_summary": "Severe smoke inhalation with extensive full-thickness burns to chest wall and airway, combined with pre-existing severe chronic lung disease",
+        "prognosis_with_ventilation": "Guarded to poor - extensive airway burns and underlying lung disease make successful weaning unlikely",
+        "prognosis_without_ventilation": "Very poor - rapid deterioration expected"
+      }
+    },
+    {
+      "patient_id": "P3",
+      "name": "Arjun Verma",
+      "age": 19,
+      "sex": "Male",
+      "chief_complaint": "Fell during evacuation, active intra-abdominal hemorrhage from a ruptured spleen",
+      "medical_report": {
+        "patient_id": "RKEMC-2026-CO-03",
+        "name": "Arjun Verma",
+        "age": 19,
+        "sex": "Male",
+        "blood_group": "O-",
+        "known_allergies": "None reported",
+        "past_medical_history": "Nil significant",
+        "vitals_on_arrival": {
+          "HR_bpm": 138,
+          "SpO2_percent": 94,
+          "RR_per_min": 26,
+          "BP_mmHg": "84/52",
+          "GCS": "14/15"
+        },
+        "injury_summary": "Active intra-abdominal hemorrhage, hemodynamically unstable and worsening by the minute without surgical source control",
+        "prognosis_with_surgery": "Good if operated on within the next 20-30 minutes",
+        "prognosis_without_surgery": "Very poor - expected to progress to hemorrhagic shock and arrest"
+      }
+    },
+    {
+      "patient_id": "P4",
+      "name": "Farida Sheikh",
+      "age": 35,
+      "sex": "Female",
+      "chief_complaint": "Open femur fracture with vascular injury to the leg during the evacuation",
+      "medical_report": {
+        "patient_id": "RKEMC-2026-CO-04",
+        "name": "Farida Sheikh",
+        "age": 35,
+        "sex": "Female",
+        "blood_group": "AB-",
+        "known_allergies": "Latex",
+        "past_medical_history": "Nil significant",
+        "vitals_on_arrival": {
+          "HR_bpm": 116,
+          "SpO2_percent": 97,
+          "RR_per_min": 20,
+          "BP_mmHg": "108/70",
+          "GCS": "15/15"
+        },
+        "injury_summary": "Open femur fracture with a vascular injury; a temporary tourniquet is currently controlling hemorrhage but the limb is at risk without definitive surgical repair",
+        "prognosis_with_surgery": "Good, including a good chance of limb salvage if operated on within a few hours",
+        "prognosis_without_surgery": "Life is not immediately threatened with the tourniquet in place, but limb viability declines the longer surgery is delayed"
+      }
+    },
+    {
+      "patient_id": "P5",
+      "name": "Nikhil Bose",
+      "age": 26,
+      "sex": "Male",
+      "chief_complaint": "Mild smoke inhalation, walking and talking normally",
+      "medical_report": {
+        "patient_id": "RKEMC-2026-CO-05",
+        "name": "Nikhil Bose",
+        "age": 26,
+        "sex": "Male",
+        "blood_group": "O+",
+        "known_allergies": "None reported",
+        "past_medical_history": "Nil significant",
+        "vitals_on_arrival": {
+          "HR_bpm": 96,
+          "SpO2_percent": 97,
+          "RR_per_min": 18,
+          "BP_mmHg": "124/80",
+          "GCS": "15/15"
+        },
+        "injury_summary": "Mild smoke inhalation, mild cough, no respiratory distress",
+        "correct_start_category": "MINOR"
+      }
+    },
+    {
+      "patient_id": "P6",
+      "name": "Ritu Malhotra",
+      "age": 48,
+      "sex": "Female",
+      "chief_complaint": "Deep laceration to the thigh with ongoing moderate hemorrhage",
+      "medical_report": {
+        "patient_id": "RKEMC-2026-CO-06",
+        "name": "Ritu Malhotra",
+        "age": 48,
+        "sex": "Female",
+        "blood_group": "A-",
+        "known_allergies": "None reported",
+        "past_medical_history": "Nil significant",
+        "vitals_on_arrival": {
+          "HR_bpm": 118,
+          "SpO2_percent": 96,
+          "RR_per_min": 22,
+          "BP_mmHg": "94/60",
+          "GCS": "15/15"
+        },
+        "injury_summary": "Deep thigh laceration with moderate ongoing blood loss, responsive to direct pressure but likely to need transfusion",
+        "correct_start_category": "IMMEDIATE"
+      }
+    }
+  ],
+  "decision_tree": {
+    "VENTILATOR_ALLOCATION": {
+      "patients_involved": [
+        "P1",
+        "P2"
+      ],
+      "nurse_dialogue": [
+        "Doctor, both Kabir and Meenu need the ventilator right now, and we only have one.",
+        "Kabir's lungs and airway are otherwise healthy -- his odds are good if we ventilate him. Meenu has extensive airway burns and longstanding lung disease -- even with the ventilator, her chances are much lower.",
+        "There's no easy answer here. What do you want to do?"
+      ],
+      "ethics_frame": "biomedical_ethics_principles.json (autonomy, beneficence, non-maleficence, justice)",
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Give the ventilator to Kabir, whose reversible injury gives him a substantially higher likelihood of survival. Support Meenu with the highest level of non-invasive oxygen and comfort care available, and reassess immediately if the ventilator frees up.",
+          "quality": "optimal",
+          "ethics_principle_applied": "Justice (utility) balanced with beneficence and non-maleficence -- allocating a scarce, life-sustaining resource to maximize the number of lives saved is the standard crisis-standards-of-care approach when one resource cannot serve two patients equally well",
+          "vitals_delta_P1": {
+            "SpO2_percent": "79 -> 93 (up)",
+            "RR_per_min": "34 -> 16 (supported)",
+            "HR_bpm": "128 -> 110 (down)"
+          },
+          "vitals_delta_P2": {
+            "SpO2_percent": "74 -> 82 (up, non-invasive support only)",
+            "RR_per_min": "36 -> 32 (down slightly)",
+            "HR_bpm": "132 -> 128 (down slightly)"
+          },
+          "new_status_P1": "STABILIZED",
+          "new_status_P2": "CRITICAL_PALLIATIVE_SUPPORT",
+          "nurse_response": [
+            "Understood, Doctor. Kabir's oxygenating well now. I'll stay close to Meenu and keep her as comfortable as possible."
+          ]
+        },
+        {
+          "option_id": "B",
+          "text": "Give the ventilator to Meenu because she arrived first and it would be unfair to prioritize a younger patient by that reasoning alone.",
+          "quality": "suboptimal_ethics",
+          "ethics_principle_applied": "A narrow reading of justice-as-first-come-first-served, applied without weighing likely benefit -- ethically defensible as a tiebreaker between similar prognoses, but not appropriate here given the large prognostic gap",
+          "vitals_delta_P1": {
+            "SpO2_percent": "79 -> 71 (down, unsupported)",
+            "RR_per_min": "34 -> 8 (declining toward arrest)",
+            "HR_bpm": "128 -> 140 (up)"
+          },
+          "vitals_delta_P2": {
+            "SpO2_percent": "74 -> 88 (up, ventilated)",
+            "RR_per_min": "36 -> 14 (supported)",
+            "HR_bpm": "132 -> 118 (down)"
+          },
+          "new_status_P1": "CRITICAL_ENDPOINT",
+          "new_status_P2": "STABILIZED_LOW_PROGNOSIS",
+          "nurse_response": [
+            "Doctor, Kabir's crashing -- he needed that ventilator far more than she did."
+          ]
+        },
+        {
+          "option_id": "C",
+          "text": "Give the ventilator to Kabir because he is younger and 'more deserving' of the resource.",
+          "quality": "critical_error",
+          "ethics_principle_applied": "Misapplies justice as a crude social-worth judgment (age/perceived deservingness) rather than a clinical likelihood-of-benefit assessment -- even though the outcome happens to match option A, the reasoning itself is an ethical error the simulation should flag",
+          "vitals_delta_P1": {
+            "SpO2_percent": "79 -> 93 (up)",
+            "RR_per_min": "34 -> 16 (supported)",
+            "HR_bpm": "128 -> 110 (down)"
+          },
+          "vitals_delta_P2": {
+            "SpO2_percent": "74 -> 82 (up, non-invasive support only)",
+            "RR_per_min": "36 -> 32 (down slightly)",
+            "HR_bpm": "132 -> 128 (down slightly)"
+          },
+          "new_status_P1": "STABILIZED",
+          "new_status_P2": "CRITICAL_PALLIATIVE_SUPPORT",
+          "nurse_response": [
+            "The outcome may be the same, Doctor, but we should be clear it's about his likelihood of recovery -- not his age."
+          ],
+          "flag_for_evaluator": "correct_outcome_wrong_ethical_reasoning"
+        },
+        {
+          "option_id": "D",
+          "text": "Attempt to alternate the single ventilator back and forth between both patients every few minutes.",
+          "quality": "critical_error",
+          "ethics_principle_applied": "Violates non-maleficence -- splitting inadequate, intermittent ventilatory support between two critically hypoxic patients risks harming both rather than adequately treating either",
+          "vitals_delta_P1": {
+            "SpO2_percent": "79 -> 80 (barely changed)",
+            "RR_per_min": "34 -> 30 (barely changed)",
+            "HR_bpm": "128 -> 134 (up)"
+          },
+          "vitals_delta_P2": {
+            "SpO2_percent": "74 -> 75 (barely changed)",
+            "RR_per_min": "36 -> 33 (barely changed)",
+            "HR_bpm": "132 -> 138 (up)"
+          },
+          "new_status_P1": "CRITICAL_ENDPOINT",
+          "new_status_P2": "CRITICAL_ENDPOINT",
+          "nurse_response": [
+            "Doctor, neither of them is getting enough support this way -- they're both declining."
+          ]
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 15
+      }
+    },
+    "OR_ALLOCATION": {
+      "patients_involved": [
+        "P3",
+        "P4"
+      ],
+      "nurse_dialogue": [
+        "Doctor, Arjun and Farida both need the OR and our one surgeon.",
+        "Arjun is actively bleeding internally and getting worse by the minute. Farida's bleeding is controlled with a tourniquet for now, but her leg is at risk the longer we wait.",
+        "We can only operate on one of them right now. What do you want to do?"
+      ],
+      "ethics_frame": "biomedical_ethics_principles.json (autonomy, beneficence, non-maleficence, justice)",
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Take Arjun to the OR first, since his bleeding is uncontrolled and immediately life-threatening. Maintain Farida's tourniquet, reassess limb viability continuously, and take her to the OR the moment the surgeon is free.",
+          "quality": "optimal",
+          "ethics_principle_applied": "Justice/utility applied through immediacy of threat to life over threat to limb, consistent with non-maleficence (avoiding the greater harm of preventable death) while still actively working to preserve Farida's limb",
+          "vitals_delta_P3": {
+            "BP_mmHg": "84/52 -> 106/70 (up, hemorrhage controlled)",
+            "HR_bpm": "138 -> 104 (down)"
+          },
+          "vitals_delta_P4": {
+            "BP_mmHg": "108/70 -> 108/70 (stable, tourniquet holding)",
+            "note": "Limb ischemia time is accruing but life is not in immediate danger"
+          },
+          "new_status_P3": "STABILIZED",
+          "new_status_P4": "WAITING_STABLE_TOURNIQUET",
+          "nurse_response": [
+            "Understood, Doctor. Arjun's in theatre now. I'm watching Farida's leg closely and the surgeon will move to her the moment he's free."
+          ]
+        },
+        {
+          "option_id": "B",
+          "text": "Take Farida to the OR first because limb loss is a devastating outcome and should be avoided at all costs.",
+          "quality": "critical_error",
+          "ethics_principle_applied": "Prioritizes a limb-threatening injury over an immediately life-threatening hemorrhage -- a well-intentioned but ethically and clinically inverted application of non-maleficence, since preventable death outweighs limb loss in triage priority",
+          "vitals_delta_P3": {
+            "BP_mmHg": "84/52 -> 68/40 (down)",
+            "HR_bpm": "138 -> 150 (up)"
+          },
+          "vitals_delta_P4": {
+            "BP_mmHg": "stable, tourniquet holding"
+          },
+          "new_status_P3": "CRITICAL_ENDPOINT",
+          "new_status_P4": "STABILIZED",
+          "nurse_response": [
+            "Doctor, Arjun didn't make it to the OR in time -- his bleeding couldn't wait."
+          ]
+        },
+        {
+          "option_id": "C",
+          "text": "Let the two patients or their families decide between themselves who goes first.",
+          "quality": "suboptimal_ethics",
+          "ethics_principle_applied": "Over-extends respect for autonomy into a decision that requires clinical judgment the patients and families cannot safely make under this time pressure -- autonomy matters, but not as a substitute for triage responsibility in an immediately life-threatening scenario",
+          "vitals_delta_P3": {
+            "BP_mmHg": "84/52 -> 72/44 (down, time lost to the discussion)",
+            "HR_bpm": "138 -> 146 (up)"
+          },
+          "vitals_delta_P4": {
+            "BP_mmHg": "stable, tourniquet holding"
+          },
+          "new_status_P3": "CRITICAL",
+          "new_status_P4": "WAITING_STABLE_TOURNIQUET",
+          "nurse_response": [
+            "Doctor, we lost precious minutes to that conversation -- Arjun needs the OR right now."
+          ]
+        },
+        {
+          "option_id": "D",
+          "text": "Delay both and wait to see if either patient's condition resolves on its own.",
+          "quality": "critical_error",
+          "ethics_principle_applied": "Violates non-maleficence for both patients -- inaction while a definitive resource is available is itself a harmful choice",
+          "vitals_delta_P3": {
+            "BP_mmHg": "84/52 -> 60/38 (down sharply)",
+            "HR_bpm": "138 -> 156 (up)"
+          },
+          "vitals_delta_P4": {
+            "BP_mmHg": "stable but limb ischemia time increasing"
+          },
+          "new_status_P3": "CRITICAL_ENDPOINT",
+          "new_status_P4": "STABLE_LIMB_AT_RISK",
+          "nurse_response": [
+            "Doctor, Arjun has arrested -- we needed to act."
+          ]
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 15
+      }
+    },
+    "P2_MANAGEMENT": {
+      "patient_id": "P2",
+      "applies_to_status": "CRITICAL_PALLIATIVE_SUPPORT",
+      "nurse_dialogue": [
+        "Meenu is on maximal non-invasive support, Doctor. Her family has just arrived. What would you like to do?"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Speak honestly with the family about her prognosis, continue maximal comfort-focused support, and reassess for the ventilator immediately if it becomes free.",
+          "quality": "optimal",
+          "ethics_principle_applied": "Autonomy (honest information for the family/surrogate decision-makers) combined with continued beneficence and non-maleficence",
+          "new_status": "COMFORT_CARE_MANAGED",
+          "nurse_response": [
+            "The family appreciated the honesty, Doctor. We're keeping her as comfortable as possible."
+          ]
+        },
+        {
+          "option_id": "B",
+          "text": "Avoid the family and give no updates.",
+          "quality": "critical_error",
+          "ethics_principle_applied": "Violates respect for autonomy and the family's right to information",
+          "new_status": "COMFORT_CARE_UNMANAGED",
+          "nurse_response": [
+            "Doctor, the family is distressed and has no idea what's happening -- they deserve an update."
+          ]
+        },
+        {
+          "option_id": "C",
+          "text": "Promise the family the ventilator will definitely become available for her soon.",
+          "quality": "critical_error",
+          "ethics_principle_applied": "Violates honesty within autonomy -- making a promise about scarce-resource availability that cannot be guaranteed",
+          "new_status": "COMFORT_CARE_UNMANAGED",
+          "nurse_response": [
+            "Doctor, we shouldn't have promised that -- it isn't something we can guarantee."
+          ]
+        },
+        {
+          "option_id": "D",
+          "text": "Withdraw all support immediately without discussion, assuming the outcome is inevitable.",
+          "quality": "critical_error",
+          "ethics_principle_applied": "Violates non-maleficence and autonomy -- withdrawing support without reassessment or family communication",
+          "new_status": "CRITICAL_ENDPOINT",
+          "nurse_response": [
+            "Doctor, that wasn't the right call without reassessing her first and talking to the family."
+          ]
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 10
+      }
+    },
+    "P4_MANAGEMENT": {
+      "patient_id": "P4",
+      "applies_to_status": "WAITING_STABLE_TOURNIQUET",
+      "nurse_dialogue": [
+        "Farida's tourniquet is holding, Doctor, and the surgeon is finishing with Arjun. What would you like to do while we wait?"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Continuously reassess limb perfusion, keep her comfortable with analgesia, and take her to the OR the moment the surgeon is free.",
+          "quality": "optimal",
+          "resource_use": [
+            "analgesic_dose"
+          ],
+          "new_status": "STABILIZED",
+          "nurse_response": [
+            "Good, Doctor. The surgeon is ready for her now -- limb still viable."
+          ]
+        },
+        {
+          "option_id": "B",
+          "text": "Leave the tourniquet in place indefinitely without reassessment.",
+          "quality": "critical_error",
+          "new_status": "PARTIAL_STABILIZATION",
+          "nurse_response": [
+            "Doctor, the delay has put the limb at higher risk than it needed to be."
+          ]
+        },
+        {
+          "option_id": "C",
+          "text": "Loosen the tourniquet periodically to 'let blood flow' without surgical control available.",
+          "quality": "critical_error",
+          "new_status": "CRITICAL_ENDPOINT",
+          "nurse_response": [
+            "Doctor, loosening it caused rebleeding without surgical control ready -- that put her at serious risk."
+          ]
+        },
+        {
+          "option_id": "D",
+          "text": "Give her no analgesia while she waits, to 'save resources'.",
+          "quality": "resource_waste",
+          "new_status": "PARTIAL_STABILIZATION",
+          "nurse_response": [
+            "Doctor, she's in unnecessary pain -- analgesia was available and appropriate here."
+          ]
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 8,
+        "resources_optimal": [
+          "analgesic_dose"
+        ]
+      }
+    },
+    "P5_MANAGEMENT": {
+      "patient_id": "P5",
+      "nurse_dialogue": [
+        "Nikhil's stable and walking, Doctor -- mild smoke inhalation. What would you like to do?"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Give supportive care (observation, mild oxygen if needed), and discharge with safety-netting advice once clear.",
+          "quality": "optimal",
+          "new_status": "STABILIZED",
+          "nurse_response": [
+            "He's doing well, Doctor -- clear for discharge with advice to return if breathing worsens."
+          ]
+        },
+        {
+          "option_id": "B",
+          "text": "Use the level's one remaining spare oxygen cylinder on him even though his saturation is normal.",
+          "quality": "resource_waste",
+          "resource_use": [
+            "oxygen_cylinders"
+          ],
+          "new_status": "STABILIZED",
+          "nurse_response": [
+            "He's fine, Doctor, but that was our last spare cylinder -- now unavailable if Kabir or Meenu need backup."
+          ]
+        },
+        {
+          "option_id": "C",
+          "text": "Ignore him completely given the other critical patients.",
+          "quality": "delay",
+          "new_status": "PARTIAL_STABILIZATION",
+          "nurse_response": [
+            "Doctor, he's fine, but a quick check and reassurance would have been appropriate."
+          ]
+        },
+        {
+          "option_id": "D",
+          "text": "Admit him to the single remaining ICU bed 'to be cautious'.",
+          "quality": "resource_waste",
+          "resource_use": [
+            "icu_beds"
+          ],
+          "new_status": "STABILIZED",
+          "nurse_response": [
+            "Doctor, that used our only ICU bed on a patient who didn't need it."
+          ]
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 6,
+        "resources_optimal": []
+      }
+    },
+    "P6_MANAGEMENT": {
+      "patient_id": "P6",
+      "nurse_dialogue": [
+        "Ritu's thigh wound is still oozing, Doctor, and she's tachycardic. We have two units of blood left. What would you like to do?"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Apply firm direct pressure, secure IV access, transfuse one unit of blood while monitoring response, and reserve the second unit in case another patient needs it.",
+          "quality": "optimal",
+          "resource_use": [
+            "blood_units"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "118 -> 102 (down)",
+            "BP_mmHg": "94/60 -> 110/72 (up)"
+          },
+          "new_status": "STABILIZED",
+          "nurse_response": [
+            "She's responding well, Doctor, and we've still got one unit of blood in reserve."
+          ]
+        },
+        {
+          "option_id": "B",
+          "text": "Transfuse both remaining units of blood into her immediately, even though one is responding well to the first.",
+          "quality": "resource_waste",
+          "resource_use": [
+            "blood_units",
+            "blood_units"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "118 -> 96 (down)",
+            "BP_mmHg": "94/60 -> 116/76 (up)"
+          },
+          "new_status": "STABILIZED_RESOURCE_INEFFICIENT",
+          "nurse_response": [
+            "She's stable, Doctor, but we now have zero blood units left for anyone else tonight."
+          ]
+        },
+        {
+          "option_id": "C",
+          "text": "Apply pressure only and withhold transfusion despite ongoing blood loss and rising heart rate.",
+          "quality": "critical_error",
+          "vitals_delta": {
+            "HR_bpm": "118 -> 128 (up)",
+            "BP_mmHg": "94/60 -> 84/54 (down)"
+          },
+          "new_status": "CRITICAL",
+          "nurse_response": [
+            "Doctor, she's getting worse -- she needed that transfusion."
+          ]
+        },
+        {
+          "option_id": "D",
+          "text": "Wait for lab cross-match confirmation before applying any pressure to the wound.",
+          "quality": "critical_error",
+          "vitals_delta": {
+            "HR_bpm": "118 -> 132 (up)",
+            "BP_mmHg": "94/60 -> 80/50 (down)"
+          },
+          "new_status": "CRITICAL",
+          "nurse_response": [
+            "Doctor, we shouldn't have delayed pressure on an actively bleeding wound."
+          ]
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 10,
+        "resources_optimal": [
+          "blood_units"
+        ]
+      }
+    },
+    "P1_FOLLOWUP": {
+      "patient_id": "P1",
+      "applies_to_status": "STABILIZED",
+      "nurse_dialogue": [
+        "Kabir's ventilated and stable, Doctor. What's the plan for ongoing monitoring?"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Continue ventilatory support with regular reassessment and plan for the single ICU bed once available.",
+          "quality": "optimal",
+          "resource_use": [
+            "icu_beds"
+          ],
+          "new_status": "STABILIZED",
+          "nurse_response": [
+            "He's holding steady, Doctor, and first in line for the ICU bed."
+          ]
+        },
+        {
+          "option_id": "B",
+          "text": "Disconnect him from the ventilator early since he 'looks better'.",
+          "quality": "critical_error",
+          "new_status": "CRITICAL_ENDPOINT",
+          "nurse_response": [
+            "Doctor, he decompensated when support was withdrawn too early."
+          ]
+        },
+        {
+          "option_id": "C",
+          "text": "Leave him on the ventilator with no further monitoring plan.",
+          "quality": "delay",
+          "new_status": "PARTIAL_STABILIZATION",
+          "nurse_response": [
+            "He's stable for now, Doctor, but we need an actual ongoing plan."
+          ]
+        },
+        {
+          "option_id": "D",
+          "text": "Give the ICU bed to someone else without a clear reassessment of Kabir's needs.",
+          "quality": "critical_error",
+          "new_status": "PARTIAL_STABILIZATION",
+          "nurse_response": [
+            "Doctor, he needed that bed -- let's revisit this decision."
+          ]
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 8,
+        "resources_optimal": [
+          "icu_beds"
+        ]
+      }
+    }
+  },
+  "flow_control": {
+    "explanation": "No decision node's option points directly at another patient's decision node. The engine advances between patients/nodes ONLY by following the fixed sequence below, never by an embedded next_decision cross-reference.",
+    "sequence": [
+      {
+        "step": 1,
+        "node": "VENTILATOR_ALLOCATION",
+        "patients_involved": [
+          "P1",
+          "P2"
+        ],
+        "on_complete": "advance to step 2"
+      },
+      {
+        "step": 2,
+        "node": "OR_ALLOCATION",
+        "patients_involved": [
+          "P3",
+          "P4"
+        ],
+        "on_complete": "advance to step 3"
+      },
+      {
+        "step": 3,
+        "patient_id": "P3",
+        "node": "implicit in OR_ALLOCATION outcome, no further P3 node in this level",
+        "on_complete": "advance to step 4"
+      },
+      {
+        "step": 4,
+        "patient_id": "P4",
+        "node": "P4_MANAGEMENT",
+        "on_complete": "advance to step 5"
+      },
+      {
+        "step": 5,
+        "patient_id": "P1",
+        "node": "P1_FOLLOWUP",
+        "on_complete": "advance to step 6"
+      },
+      {
+        "step": 6,
+        "patient_id": "P2",
+        "node": "P2_MANAGEMENT",
+        "on_complete": "advance to step 7"
+      },
+      {
+        "step": 7,
+        "patient_id": "P5",
+        "node": "P5_MANAGEMENT",
+        "on_complete": "advance to step 8"
+      },
+      {
+        "step": 8,
+        "patient_id": "P6",
+        "node": "P6_MANAGEMENT",
+        "on_complete": "level complete -> evaluate endings.level_outcome_logic"
+      }
+    ]
+  },
+  "endings": {
+    "level_outcome_logic": "Level 5 result is computed across all 6 patients and both allocation decisions. SUCCESS requires: (1) the higher-survivability patient received the scarce resource in both VENTILATOR_ALLOCATION and OR_ALLOCATION, (2) no patient reaches CRITICAL_ENDPOINT, and (3) all six patients reach a STABILIZED, STABLE_*, or an appropriately-managed comfort-care status. The ethics_reasoning_quality score is tracked separately from the raw outcome, since some options (e.g. VENTILATOR_ALLOCATION option C) can produce the correct clinical outcome via flawed ethical reasoning, which the performance report flags for review.",
+    "SUCCESS": {
+      "status_code": "SUCCESS",
+      "banner": "CRITICAL OVERLOAD MANAGED"
+    },
+    "SUCCESS_WITH_PENALTY": {
+      "status_code": "SUCCESS_WITH_PENALTY",
+      "banner": "CRITICAL OVERLOAD MANAGED (RESOURCE-INEFFICIENT / ETHICAL REASONING FLAGGED)"
+    },
+    "FAILURE": {
+      "status_code": "FAILURE",
+      "banner": "CRITICAL OVERLOAD - PREVENTABLE LOSS OF LIFE"
+    }
+  },
+  "performance_report_schema": {
+    "allocation_decisions": {
+      "VENTILATOR_ALLOCATION": {
+        "option_selected": "string",
+        "clinical_outcome_optimal": "boolean",
+        "ethics_reasoning_sound": "boolean"
+      },
+      "OR_ALLOCATION": {
+        "option_selected": "string",
+        "clinical_outcome_optimal": "boolean",
+        "ethics_reasoning_sound": "boolean"
+      }
+    },
+    "decision_history": [
+      {
+        "decision_id": "string",
+        "patient_id": "string or array",
+        "action_text": "string",
+        "quality": "optimal|suboptimal_ethics|resource_waste|delay|critical_error",
+        "time_taken_seconds": "number (runtime)",
+        "expected_seconds": "number (authored)"
+      }
+    ],
+    "resource_summary": {
+      "total_units_available": "sum of resource_pool_at_level_start",
+      "total_units_consumed": "runtime",
+      "units_wasted": "runtime"
+    },
+    "score_components": [
+      "allocation_decision_quality",
+      "ethics_reasoning_quality",
+      "decision_quality",
+      "response_time",
+      "resource_efficiency",
+      "protocol_adherence_start_cdc_esi_ethics"
+    ]
+  }
+}

@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}EMERGIQ — Dashboard{% endblock %}
+
+{% block content %}
+<div class="wrap page">
+  {% for r in hosted_rooms if r.expiring_soon %}
+    <div class="alert">
+      <span style="font-size:20px" aria-hidden="true">&#9888;</span>
+      <div>
+        <h4>Assessment expiring soon</h4>
+        <p style="margin:0;font-size:14px">{{ r.name }} ({{ r.code }}) will expire on <b>{{ r.to_date.strftime('%d %b %Y') if r.to_date }}</b>. The history of the assessment will be removed permanently.</p>
+        <p style="margin:6px 0 0;font-size:12.5px;color:var(--muted)">Your self-learning history is not affected.</p>
+      </div>
+    </div>
+  {% endfor %}
+
+  <p class="tagline" style="letter-spacing:.05em;font-size:15px">&ldquo;Practice the Pressure. Master the Decision.&rdquo;</p>
+  <h1 class="ptt" style="margin-top:6px">Welcome back, {{ current_user.name.split(' ')[0] }}</h1>
+  <p class="muted" style="margin-top:6px">{{ current_user.email }}</p>
+
+  <div class="grid3" style="margin-top:28px;align-items:start">
+    <div class="card">
+      <span class="eyebrow">Self Learning progress</span>
+      <div style="margin-top:12px">
+        <div class="stat"><span class="k">Current level</span><span class="v">{{ 'All levels complete' if self_learning.all_completed else ('Level %02d'|format(self_learning.current_level) if self_learning.current_level else '—') }}</span></div>
+        <div class="stat"><span class="k">Levels completed</span><span class="v">{{ self_learning.completed_count }} / {{ self_learning.total_levels }}</span></div>
+        <div class="stat"><span class="k">Latest score</span><span class="v">{{ (self_learning.latest_score|string ~ '%') if self_learning.latest_score is not none else '—' }}</span></div>
+        <div class="stat"><span class="k">Best score</span><span class="v">{{ (self_learning.best_score|string ~ '%') if self_learning.best_score is not none else '—' }}</span></div>
+      </div>
+      <div class="bar" style="margin:14px 0 16px"><i style="width:{{ (self_learning.completed_count / self_learning.total_levels * 100) if self_learning.total_levels else 0 }}%"></i></div>
+      <a class="btn btn-primary" href="{{ url_for('dashboard.self_learning') }}" style="width:100%;display:block;text-align:center">{{ 'Continue Learning' if self_learning.completed_count else 'Start Learning' }}</a>
+    </div>
+
+    <div class="card">
+      <span class="eyebrow">Recent score</span>
+      <div style="margin-top:12px">
+        {% if self_learning.recent %}
+          <div class="stat"><span class="k">Recent level</span><span class="v">Level {{ '%02d'|format(self_learning.recent.level) }}</span></div>
+          <div class="stat"><span class="k">Score</span><span class="v">{{ (self_learning.recent.average_total|round|int) if self_learning.recent.average_total is not none else 0 }}%</span></div>
+          <div class="stat"><span class="k">Outcome</span><span class="v" style="font-size:.85rem">{{ self_learning.recent.outcome_label or '—' }}</span></div>
+          <div class="stat"><span class="k">Completed</span><span class="v" style="font-size:.85rem">{{ self_learning.recent.completed_at.strftime('%d %b %Y') if self_learning.recent.completed_at }}</span></div>
+        {% else %}
+          <div class="empty"><div class="big">No completed simulations yet.</div>Finish a Self Learning level to see your score here.</div>
+        {% endif %}
+      </div>
+      <a class="btn btn-ghost" href="{{ url_for('dashboard.download_dashboard_report_pdf') }}" style="width:100%;margin-top:16px;display:block;text-align:center">Download Performance Report</a>
+    </div>
+
+    <div class="card">
+      <span class="eyebrow">Achievements</span>
+      <div class="achs" style="margin-top:14px">
+        {% if achievements %}
+          {% for a in achievements %}<span class="pill {{ a.tone }}" title="{{ a.detail }}">{{ a.label|upper }}</span>{% endfor %}
+        {% else %}
+          <p class="muted" style="font-size:13px;margin:0">No achievements unlocked yet.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:18px">
+    <span class="eyebrow q">Performance history</span>
+    <div class="tablewrap" style="margin-top:12px">
+      {% set solo_attempts = report.attempts|selectattr('room', 'equalto', 'Solo practice')|list %}
+      {% if solo_attempts %}
+        <table>
+          <thead><tr><th>Level</th><th>Score</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody>
+            {% for a in solo_attempts %}
+              <tr>
+                <td>Level {{ a.level }}</td>
+                <td class="mono">{{ a.score }}</td>
+                <td><span class="pill {{ 'ok' if a.status == 'completed' else 'warn' }}">{{ 'Completed' if a.status == 'completed' else 'Time expired' }}</span></td>
+                <td class="mono" style="white-space:nowrap">{{ a.date }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="muted" style="font-size:13px;margin:0">No completed simulations yet.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:18px;align-items:start">
+    <div class="card">
+      <span class="eyebrow q">Assessment history</span>
+      <div style="margin-top:8px">
+        {% if joined_rooms %}
+          {% for m in joined_rooms %}
+            <div class="list-item">
+              <div><div class="t">{{ m.room.name }}</div><div class="s mono">{{ m.room.code }} &middot; {{ m.room.status }}</div></div>
+              <div style="display:flex;gap:10px;align-items:center">
+                <a class="btn btn-quiet btn-sm" href="{{ url_for('rooms.room_detail', code=m.room.code) }}">Open</a>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="muted" style="font-size:13px;margin:8px 0 0">No assessment history yet.</p>
+        {% endif %}
+      </div>
+    </div>
+    <div class="card">
+      <span class="eyebrow q">Hosted assessments</span>
+      <div style="margin-top:8px">
+        {% if hosted_rooms %}
+          {% for r in hosted_rooms %}
+            <div class="list-item">
+              <div>
+                <div class="t">{{ r.name }} <span class="pill {{ 'crit' if r.status == 'expired' else ('blue' if r.status == 'active' else ('ok' if r.status == 'completed' else 'warn')) }}" style="margin-left:6px">{{ r.status|upper }}</span></div>
+                <div class="s"><span class="mono">{{ r.code }}</span> &middot; {{ r.from_date.strftime('%d %b') if r.from_date }} &ndash; {{ r.to_date.strftime('%d %b') if r.to_date }} &middot; {{ r.participant_count() }} / {{ r.participant_limit }} participants</div>
+              </div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <a class="btn btn-quiet btn-sm" href="{{ url_for('rooms.room_detail', code=r.code) }}">Open room</a>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="muted" style="font-size:13px;margin:8px 0 0">You have not hosted an assessment yet.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <p class="protonote">Self-learning history is permanent and is never removed when an assessment expires.</p>
+</div>
+{% endblock %}

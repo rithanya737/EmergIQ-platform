@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}EMERGIQ — Assessment Report {{ room.code }}{% endblock %}
+
+{% block content %}
+<div class="wrap page" style="max-width:960px">
+  <div class="sechead" style="margin-top:0">
+    <div>
+      <span class="eyebrow">Assessment performance report</span>
+      <h1 class="ptt" style="margin-top:8px">{{ report.learner_name }}</h1>
+      <p class="muted" style="margin-top:6px">
+        Room: {{ report.room_name }} ({{ report.room_code }})
+        {% if report.instructor_name %} &middot; Instructor: {{ report.instructor_name }}{% endif %}
+      </p>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <a class="btn btn-ghost btn-sm" href="{{ url_for('rooms.room_detail', code=room.code) }}">Room</a>
+      <a class="btn btn-primary" href="{{ download_url }}">Download Report</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <span class="eyebrow q">Levels in this assessment</span>
+    <p class="muted" style="margin:10px 0 0;font-size:13px">
+      Completed: <strong style="color:var(--text)">{{ report.levels_played|join(', ') if report.levels_played else 'none' }}</strong>
+      {% if report.levels_skipped %}
+        &nbsp;&middot;&nbsp; Not attempted: <strong style="color:var(--text)">{{ report.levels_skipped|join(', ') }}</strong>
+      {% endif %}
+    </p>
+  </div>
+
+  {% if report.levels %}
+    <div class="card" style="margin-top:18px">
+      <span class="eyebrow q">Overall assessment outcome</span>
+      <div style="margin-top:12px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <span style="font-family:'Saira',sans-serif;font-size:40px;font-weight:700">{{ report.overall.average_total }}</span>
+        <span class="pill {{ 'ok' if 'Excellent' in report.overall.outcome_label or 'Acceptable' in report.overall.outcome_label else ('crit' if 'Deteriorated' in report.overall.outcome_label else 'warn') }}">{{ report.overall.outcome_label }}</span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <span class="eyebrow q">Performance by level</span>
+      <div class="tablewrap" style="margin-top:12px">
+        <table>
+          <thead>
+            <tr><th>Level</th><th>Scenario</th><th>Accuracy</th><th>Speed</th><th>Efficiency</th><th>Ethics</th><th>Score</th><th>Outcome</th></tr>
+          </thead>
+          <tbody>
+            {% for lv in report.levels %}
+              <tr>
+                <td>Level {{ lv.level }}</td>
+                <td>{{ lv.scenario_title or '—' }}</td>
+                <td class="mono">{{ lv.clinical_accuracy }}</td>
+                <td class="mono">{{ lv.response_time }}</td>
+                <td class="mono">{{ lv.response_efficiency }}</td>
+                <td class="mono">{{ lv.ethical_reasoning }}</td>
+                <td class="mono">{{ lv.score }}</td>
+                <td>
+                  <span class="pill {{ 'ok' if 'Excellent' in lv.outcome_label or 'Acceptable' in lv.outcome_label else ('crit' if 'Deteriorated' in lv.outcome_label else 'warn') }}">{{ lv.outcome_label }}</span>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% else %}
+    <div class="empty" style="margin-top:18px"><div class="big">No levels were completed in this assessment.</div></div>
+  {% endif %}
+  <p class="protonote">This report covers only your own attempts in this room. The Host can view every participant's report from the room page.</p>
+</div>
+{% endblock %}

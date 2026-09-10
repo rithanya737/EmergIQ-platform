@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}EMERGIQ — Choose your path{% endblock %}
+
+{% block content %}
+<div class="wrap page">
+  <p class="tagline" style="letter-spacing:.05em;font-size:15px">&ldquo;Practice the Pressure. Master the Decision.&rdquo;</p>
+  <h1 class="ptt" style="margin-top:6px">Welcome, {{ current_user.name.split(' ')[0] }}</h1>
+  <p class="muted" style="margin-top:6px">EMERGIQ Emergency Medical Center &middot; Chennai, India</p>
+
+  <div class="grid3" style="margin-top:28px">
+    <a class="card access-card" href="{{ url_for('dashboard.self_learning') }}">
+      <span class="eyebrow">01 &mdash; Self Learning</span>
+      <h2>Self Learning</h2>
+      <p class="muted" style="font-size:13.5px;margin:0">Start individual learning. Work through progressive emergency levels at your own pace &mdash; no leaderboard, no ranking.</p>
+      <span class="btn btn-primary go">Open Self Learning</span>
+    </a>
+    <a class="card access-card" href="{{ url_for('rooms.create_room') }}">
+      <span class="eyebrow">02 &mdash; Create Room</span>
+      <h2>Create Room</h2>
+      <p class="muted" style="font-size:13.5px;margin:0">Create an assessment room and become its Host. Choose the difficulty, pick which levels to include, and set a participant limit and assessment window.</p>
+      <span class="btn btn-ghost go">Create Room</span>
+    </a>
+    <a class="card access-card" href="{{ url_for('rooms.join_room') }}">
+      <span class="eyebrow">03 &mdash; Join Assessment</span>
+      <h2>Join Assessment</h2>
+      <p class="muted" style="font-size:13.5px;margin:0">Join using a room code shared by your Host and take the assessment live.</p>
+      <span class="btn btn-ghost go">Join Assessment</span>
+    </a>
+  </div>
+  <p style="margin-top:22px"><a href="{{ url_for('dashboard.dashboard') }}">Open your dashboard &rarr;</a></p>
+</div>
+{% endblock %}

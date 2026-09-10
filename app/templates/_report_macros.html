@@ -1,0 +1,70 @@
+{# Shared macros for report.html / dashboard.html / room_report.html #}
+
+{% macro outcome_class(label) -%}
+  {%- if 'Excellent' in label -%}outcome--excellent
+  {%- elif 'Acceptable' in label -%}outcome--acceptable
+  {%- elif 'Uncertain' in label -%}outcome--uncertain
+  {%- elif 'Deteriorated' in label -%}outcome--critical
+  {%- else -%}outcome--uncertain
+  {%- endif -%}
+{%- endmacro %}
+
+{% macro ring_color(label) -%}
+  {%- if 'Excellent' in label -%}var(--color-excellent)
+  {%- elif 'Acceptable' in label -%}var(--color-acceptable)
+  {%- elif 'Uncertain' in label -%}var(--color-uncertain)
+  {%- elif 'Deteriorated' in label -%}var(--color-critical)
+  {%- else -%}var(--brand-accent)
+  {%- endif -%}
+{%- endmacro %}
+
+{% macro verdict_class(verdict) -%}
+  verdict-{{ verdict|default('acceptable', true)|lower }}
+{%- endmacro %}
+
+{% macro score_ring(score, label) %}
+  <div class="score-ring" style="--pct: {{ score }}; --ring-color: {{ ring_color(label) }};">
+    <div class="score-ring__inner">
+      <div class="score-ring__value">{{ score }}</div>
+      <div class="score-ring__of">/ 100</div>
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro metric_bars(outcome) %}
+  <div class="metric-bars">
+    <div class="metric-bar__row">
+      <span class="metric-bar__label">Clinical accuracy</span>
+      <span class="metric-bar__track"><span class="metric-bar__fill" style="width: {{ outcome.clinical_accuracy }}%"></span></span>
+      <span class="metric-bar__value">{{ outcome.clinical_accuracy }}</span>
+    </div>
+    <div class="metric-bar__row">
+      <span class="metric-bar__label">Response time</span>
+      <span class="metric-bar__track"><span class="metric-bar__fill" style="width: {{ outcome.response_time }}%"></span></span>
+      <span class="metric-bar__value">{{ outcome.response_time }}</span>
+    </div>
+    <div class="metric-bar__row">
+      <span class="metric-bar__label">Response efficiency</span>
+      <span class="metric-bar__track"><span class="metric-bar__fill" style="width: {{ outcome.response_efficiency }}%"></span></span>
+      <span class="metric-bar__value">{{ outcome.response_efficiency }}</span>
+    </div>
+    <div class="metric-bar__row">
+      <span class="metric-bar__label">Ethical reasoning</span>
+      <span class="metric-bar__track"><span class="metric-bar__fill" style="width: {{ outcome.ethical_reasoning }}%"></span></span>
+      <span class="metric-bar__value">{{ outcome.ethical_reasoning }}</span>
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro outcome_summary_card(outcome, title="Overall outcome") %}
+  <div class="report-card">
+    <h2>{{ title }}</h2>
+    <div class="outcome-summary">
+      {{ score_ring(outcome.average_total, outcome.outcome_label) }}
+      <div>
+        <span class="outcome-label-badge {{ outcome_class(outcome.outcome_label) }}">{{ outcome.outcome_label }}</span>
+        {{ metric_bars(outcome) }}
+      </div>
+    </div>
+  </div>
+{% endmacro %}

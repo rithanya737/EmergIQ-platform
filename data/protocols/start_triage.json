@@ -1,0 +1,20 @@
+{
+  "protocol": "START Triage (Simple Triage And Rapid Treatment)",
+  "purpose": "Rapidly sort multiple casualties into treatment priority categories using ability to walk, breathing, perfusion, and mental status.",
+  "steps": [
+    "Step 1 - Ambulatory check: If the patient can walk, tag them MINOR and direct them to a holding/treatment area.",
+    "Step 2 - Spontaneous breathing check: If not breathing, open the airway (head-tilt/chin-lift or jaw-thrust). If still not breathing after airway is opened, tag EXPECTANT (deceased/not expected to survive).",
+    "Step 3 - Respiratory rate check: If breathing resumes after airway positioning, or respiratory rate is greater than 30/min, tag IMMEDIATE.",
+    "Step 4 - Perfusion check: If respiratory rate is 30/min or less, check capillary refill (or radial pulse). Capillary refill greater than 2 seconds, or absent radial pulse, tags IMMEDIATE; control major bleeding.",
+    "Step 5 - Mental status check: If perfusion is normal, assess whether the patient can follow simple commands. Cannot follow commands = IMMEDIATE. Can follow commands = DELAYED."
+  ],
+  "categories": {
+    "immediate": "Victim has severe, life-threatening injuries requiring immediate treatment.",
+    "delayed": "Victim has potentially severe injuries, but treatment can be delayed up to a few hours.",
+    "minor": "Victim has minor injuries not requiring immediate treatment (the 'walking wounded').",
+    "expectant": "Victim is deceased or is not expected to survive given the severity of injury and available resources."
+  },
+  "_sources": [
+    {"title": "START Adult Triage Algorithm - Mass Casualty Incident Triage (MCI Triage)", "url": "https://mcitriage.org/start"}
+  ]
+}

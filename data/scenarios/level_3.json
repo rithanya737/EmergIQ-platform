@@ -1,0 +1,762 @@
+{
+  "level_id": 3,
+  "level_name": "Priority Decision",
+  "codename": "EmergIQ - Priority Decision",
+  "difficulty": "Medium-Hard",
+  "patient_count": 2,
+  "main_skill": "Prioritize between patients",
+  "core_question": "Which patient needs me first?",
+  "protocol_reference": {
+    "primary_source": "esi_levels.json",
+    "attribution": "AHRQ ESI (Emergency Severity Index) Handbook",
+    "usage_note": "The initial prioritization decision is scored against ESI acuity logic: a patient with abnormal vitals and altered mental status outranks a patient with normal vitals and an isolated stable injury, regardless of who is more vocal about pain."
+  },
+  "note": "All names, vitals, and clinical details below are entirely fictional training content generated for simulation purposes.",
+  "intro_sequence": {
+    "phase_1_nurse_intro": {
+      "character": "Nurse Maya",
+      "dialogue": [
+        "Doctor, two patients just arrived together from the same road traffic accident.",
+        "An 8-year-old boy, Farhan, and a 45-year-old woman, Lakshmi -- she's his aunt.",
+        "We only have you and me right now. Who would you like to assess first?"
+      ]
+    }
+  },
+  "patients": [
+    {
+      "patient_id": "P1",
+      "name": "Farhan Sheikh",
+      "age": 8,
+      "sex": "Male",
+      "chief_complaint": "Passenger in road traffic accident, drowsy, abdominal tenderness",
+      "arrival_mode": "Brought in by ambulance",
+      "initial_status": "AT_RISK",
+      "initial_vitals": {
+        "HR_bpm": 121,
+        "SpO2_percent": 94,
+        "RR_per_min": 28,
+        "BP_mmHg": "92/60",
+        "consciousness": "Drowsy, opens eyes to voice"
+      },
+      "medical_report": {
+        "patient_id": "RKEMC-2026-00162",
+        "name": "Farhan Sheikh",
+        "age": 8,
+        "sex": "Male",
+        "blood_group": "A+",
+        "known_allergies": "None reported",
+        "past_medical_history": "Nil significant",
+        "current_medications": "None",
+        "presenting_complaint": "Rear-seat passenger in low-speed collision, complaining of abdominal pain, increasingly drowsy since arrival",
+        "vitals_on_arrival": {
+          "HR_bpm": 121,
+          "SpO2_percent": 94,
+          "RR_per_min": 28,
+          "BP_mmHg": "92/60",
+          "Temp_C": 36.7,
+          "GCS": "13/15"
+        },
+        "triage_category_esi": "ESI-2 (abnormal vitals plus altered mental status; high-risk for occult internal injury)",
+        "time_of_arrival": "19:41",
+        "assigned_team": "Emergency Bay 2 - Dr. (Player), Nurse Maya"
+      }
+    },
+    {
+      "patient_id": "P2",
+      "name": "Lakshmi Devi",
+      "age": 45,
+      "sex": "Female",
+      "chief_complaint": "Closed deformity of the left forearm, severe pain, fully alert",
+      "arrival_mode": "Brought in by ambulance, same accident",
+      "initial_status": "STABLE_PAINFUL",
+      "initial_vitals": {
+        "HR_bpm": 88,
+        "SpO2_percent": 98,
+        "RR_per_min": 16,
+        "BP_mmHg": "128/82",
+        "consciousness": "Alert, in visible pain, repeatedly calling out"
+      },
+      "medical_report": {
+        "patient_id": "RKEMC-2026-00163",
+        "name": "Lakshmi Devi",
+        "age": 45,
+        "sex": "Female",
+        "blood_group": "B+",
+        "known_allergies": "Penicillin (rash)",
+        "past_medical_history": "Nil significant",
+        "current_medications": "None",
+        "presenting_complaint": "Left forearm struck door frame during collision; visible deformity, unable to move wrist, pain 8/10",
+        "vitals_on_arrival": {
+          "HR_bpm": 88,
+          "SpO2_percent": 98,
+          "RR_per_min": 16,
+          "BP_mmHg": "128/82",
+          "Temp_C": 37.0,
+          "GCS": "15/15"
+        },
+        "triage_category_esi": "ESI-4 (single stable extremity injury, normal vitals, no resource beyond X-ray and splinting expected)",
+        "time_of_arrival": "19:41",
+        "assigned_team": "Emergency Bay 2 - Dr. (Player), Nurse Maya"
+      }
+    }
+  ],
+  "decision_tree": {
+    "D0_TRIAGE": {
+      "nurse_dialogue": [
+        "Doctor, we have two patients. Farhan is drowsy and his belly is tender. Lakshmi is in a lot of pain from her arm but talking to us clearly.",
+        "Who would you like to assess first?"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Assess Farhan first -- his drowsiness and abnormal vitals suggest a higher-acuity problem.",
+          "protocol_alignment": "ESI-correct prioritization: altered mental status + abnormal vitals outranks a stable painful injury",
+          "quality": "optimal",
+          "effect_on_P1": {
+            "status": "AT_RISK",
+            "vitals_delta": "unchanged, addressed immediately"
+          },
+          "effect_on_P2": {
+            "status": "STABLE_PAINFUL",
+            "vitals_delta": "unchanged, safe to wait -- Nurse Maya applies a temporary sling and ice"
+          },
+          "nurse_response": [
+            "Good call, Doctor. I'll keep Lakshmi comfortable with a sling while you see Farhan."
+          ],
+          "next_decision": "D1_FARHAN"
+        },
+        {
+          "option_id": "B",
+          "text": "Assess Lakshmi first -- she is the one clearly in distress and asking for help.",
+          "protocol_alignment": "Prioritizes the louder complaint over objective acuity; a classic ESI-triage error",
+          "quality": "critical_error",
+          "effect_on_P1": {
+            "status": "DETERIORATING",
+            "vitals_delta": {
+              "HR_bpm": "121 -> 130 (up)",
+              "SpO2_percent": "94 -> 90 (down)",
+              "RR_per_min": "28 -> 32 (up)",
+              "BP_mmHg": "92/60 -> 84/54 (down)"
+            },
+            "note": "Farhan's drowsiness deepens while unattended"
+          },
+          "effect_on_P2": {
+            "status": "STABLE_PAINFUL",
+            "vitals_delta": "unchanged"
+          },
+          "nurse_response": [
+            "Doctor, while you were splinting Lakshmi's arm, Farhan has become harder to rouse.",
+            "I think we need to see him urgently now."
+          ],
+          "next_decision": "D1_FARHAN"
+        },
+        {
+          "option_id": "C",
+          "text": "Try to check on both at the same time, splitting your attention.",
+          "protocol_alignment": "No clear prioritization; slows both assessments and delays the higher-acuity patient",
+          "quality": "delay",
+          "effect_on_P1": {
+            "status": "DETERIORATING",
+            "vitals_delta": {
+              "HR_bpm": "121 -> 126 (up)",
+              "SpO2_percent": "94 -> 92 (down)",
+              "RR_per_min": "28 -> 30 (up)",
+              "BP_mmHg": "92/60 -> 88/58 (down)"
+            }
+          },
+          "effect_on_P2": {
+            "status": "STABLE_PAINFUL",
+            "vitals_delta": "unchanged, but pain score rises to 9/10 from delay in analgesia"
+          },
+          "nurse_response": [
+            "Doctor, going back and forth is costing us time with Farhan -- his observations are slipping."
+          ],
+          "next_decision": "D1_FARHAN"
+        },
+        {
+          "option_id": "D",
+          "text": "Ask Nurse Maya to decide who should be seen first.",
+          "protocol_alignment": "Defers the clinical prioritization decision that is the doctor's responsibility",
+          "quality": "delay",
+          "effect_on_P1": {
+            "status": "DETERIORATING",
+            "vitals_delta": {
+              "HR_bpm": "121 -> 127 (up)",
+              "SpO2_percent": "94 -> 91 (down)",
+              "RR_per_min": "28 -> 31 (up)",
+              "BP_mmHg": "92/60 -> 86/56 (down)"
+            }
+          },
+          "effect_on_P2": {
+            "status": "STABLE_PAINFUL",
+            "vitals_delta": "unchanged"
+          },
+          "nurse_response": [
+            "Doctor, I'd say Farhan needs you first -- and honestly, every second we spent deciding mattered. He's more drowsy now."
+          ],
+          "next_decision": "D1_FARHAN"
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 10,
+        "resources_optimal": []
+      }
+    },
+    "D1_FARHAN": {
+      "patient_id": "P1",
+      "applies_to_status": [
+        "AT_RISK",
+        "DETERIORATING"
+      ],
+      "nurse_dialogue": [
+        "Farhan is drowsy and his abdomen is tender, Doctor. What would you like to do?"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Perform a rapid ABCDE primary survey, get IV access, and send urgent bloods plus a FAST-equivalent abdominal scan.",
+          "protocol_alignment": "ABCDE-consistent primary survey for suspected internal bleeding in a trauma patient",
+          "quality": "optimal",
+          "resource_use": [
+            "iv_cannula_kit",
+            "ultrasound_bedside"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "-> stabilizing",
+            "SpO2_percent": "-> improving",
+            "RR_per_min": "-> improving",
+            "BP_mmHg": "-> stabilizing"
+          },
+          "new_status": "RECOVERING",
+          "nurse_response": [
+            "Scan shows free fluid in the abdomen, Doctor -- likely a splenic injury. IV access secured.",
+            "What would you like to do next?"
+          ],
+          "next_decision": "D2_FARHAN"
+        },
+        {
+          "option_id": "B",
+          "text": "Wait and reassess him again in a few minutes.",
+          "protocol_alignment": "Delay in a trauma patient with abnormal vitals and altered mental status",
+          "quality": "critical_error",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "up",
+            "SpO2_percent": "down",
+            "RR_per_min": "up",
+            "BP_mmHg": "down"
+          },
+          "new_status": "CRITICAL",
+          "nurse_response": [
+            "Doctor, he's becoming much harder to rouse and his pressure is dropping fast."
+          ],
+          "next_decision": "D2_FARHAN"
+        },
+        {
+          "option_id": "C",
+          "text": "Take a full history from the accompanying family before examining him.",
+          "protocol_alignment": "Delays primary survey in a trauma patient",
+          "quality": "delay",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "up",
+            "SpO2_percent": "down",
+            "RR_per_min": "up",
+            "BP_mmHg": "down"
+          },
+          "new_status": "DETERIORATING",
+          "nurse_response": [
+            "Doctor, while we talked, his breathing has picked up and he's paler."
+          ],
+          "next_decision": "D2_FARHAN"
+        },
+        {
+          "option_id": "D",
+          "text": "Send him for a routine, non-urgent X-ray before anything else.",
+          "protocol_alignment": "Removes an unstable trauma patient from direct observation for a non-urgent step",
+          "quality": "critical_error",
+          "resource_use": [
+            "radiology_slot"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "up sharply",
+            "SpO2_percent": "down sharply",
+            "RR_per_min": "up sharply",
+            "BP_mmHg": "down sharply"
+          },
+          "new_status": "CRITICAL",
+          "nurse_response": [
+            "Doctor, he deteriorated in the corridor on the way to X-ray -- we need to act immediately."
+          ],
+          "next_decision": "D2_FARHAN"
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 12,
+        "resources_optimal": [
+          "iv_cannula_kit",
+          "ultrasound_bedside"
+        ]
+      }
+    },
+    "D2_FARHAN": {
+      "patient_id": "P1",
+      "applies_to_status": [
+        "RECOVERING",
+        "DETERIORATING",
+        "CRITICAL"
+      ],
+      "nurse_dialogue_by_state": {
+        "RECOVERING": [
+          "The scan confirmed intra-abdominal bleeding, Doctor. What's the plan?"
+        ],
+        "DETERIORATING": [
+          "Doctor, he's still declining -- what now?"
+        ],
+        "CRITICAL": [
+          "Doctor, he's critical -- we need definitive action."
+        ]
+      },
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Start IV fluid resuscitation, give oxygen, and activate the surgical team for urgent laparotomy assessment.",
+          "protocol_alignment": "Correct escalation for suspected solid-organ injury with hemodynamic compromise",
+          "quality": "optimal",
+          "resource_use": [
+            "iv_fluids",
+            "oxygen_mask",
+            "surgical_call"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "down",
+            "SpO2_percent": "up",
+            "RR_per_min": "down",
+            "BP_mmHg": "up"
+          },
+          "new_status": "UNSTABLE_RECOVERING",
+          "nurse_response": [
+            "He's responding to fluids, Doctor. Surgical team is on the way."
+          ],
+          "next_decision": "D3_FARHAN"
+        },
+        {
+          "option_id": "B",
+          "text": "Give him something for the pain and continue watching.",
+          "protocol_alignment": "Fails to address the underlying hemorrhage",
+          "quality": "critical_error",
+          "resource_use": [
+            "analgesic_dose"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "up",
+            "SpO2_percent": "down",
+            "RR_per_min": "up",
+            "BP_mmHg": "down"
+          },
+          "new_status": "CRITICAL",
+          "nurse_response": [
+            "Doctor, pain relief isn't going to fix internal bleeding -- he's getting worse."
+          ],
+          "next_decision": "D3_FARHAN"
+        },
+        {
+          "option_id": "C",
+          "text": "Wait for the surgical team to arrive before doing anything further.",
+          "protocol_alignment": "Delays resuscitation that should start immediately, in parallel with the surgical call",
+          "quality": "delay",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "up",
+            "SpO2_percent": "down",
+            "RR_per_min": "up",
+            "BP_mmHg": "down"
+          },
+          "new_status": "CRITICAL",
+          "nurse_response": [
+            "Doctor, we shouldn't wait -- let's start resuscitating him now while surgery is on the way."
+          ],
+          "next_decision": "D3_FARHAN"
+        },
+        {
+          "option_id": "D",
+          "text": "Discharge him to the ward for observation, since he's still talking.",
+          "protocol_alignment": "Unsafe disposition for a patient with suspected active internal hemorrhage",
+          "quality": "critical_error",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "unrecordable",
+            "SpO2_percent": "unrecordable",
+            "RR_per_min": "agonal",
+            "BP_mmHg": "unrecordable"
+          },
+          "new_status": "ARREST",
+          "nurse_response": [
+            "Doctor! He's arrested on the ward -- bringing him back to resus now!"
+          ],
+          "next_decision": "D3_FARHAN"
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 10,
+        "resources_optimal": [
+          "iv_fluids",
+          "oxygen_mask",
+          "surgical_call"
+        ]
+      }
+    },
+    "D3_FARHAN": {
+      "patient_id": "P1",
+      "applies_to_status": [
+        "UNSTABLE_RECOVERING",
+        "CRITICAL",
+        "PERI_ARREST",
+        "ARREST"
+      ],
+      "recoverability_rule": {
+        "explanation": "Resolves outcome_if_prior_state_recoverable vs outcome_if_prior_state_unrecoverable, matching the same rule used in Level 1 and Level 2: reaching full ARREST before the final decision is the only unrecoverable prior state -- even the optimal D3 option cannot guarantee saving him from there. UNSTABLE_RECOVERING, CRITICAL and PERI_ARREST are all still recoverable via the optimal option. Farhan reaches ARREST only if the player chooses the worst option at every prior decision (D1_FARHAN:B/C/D -> D2_FARHAN:B/C/D -> D2_FARHAN option D specifically triggers ARREST). This is the level's genuine death path: repeated bad decisions compound into a state no final decision can undo.",
+        "unrecoverable_prior_states": [
+          "ARREST"
+        ],
+        "recoverable_prior_states": [
+          "UNSTABLE_RECOVERING",
+          "CRITICAL",
+          "PERI_ARREST"
+        ]
+      },
+      "nurse_dialogue_by_state": {
+        "UNSTABLE_RECOVERING": [
+          "He's improving, Doctor, but still needs close monitoring before we move to Lakshmi."
+        ],
+        "CRITICAL": [
+          "Doctor, this may be our last chance with him."
+        ],
+        "PERI_ARREST": [
+          "Doctor, he's peri-arrest -- we need definitive action now."
+        ],
+        "ARREST": [
+          "Doctor, he has arrested -- we're starting resuscitation now."
+        ]
+      },
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Confirm he's stable enough for surgical handover, hand over clearly, then move to reassess Lakshmi.",
+          "protocol_alignment": "Completes the reassess-and-stabilize loop before shifting attention",
+          "quality": "optimal",
+          "resource_use": [
+            "monitor"
+          ],
+          "outcome_if_prior_state_recoverable": "FARHAN_STABILIZED",
+          "outcome_if_prior_state_unrecoverable": "FARHAN_CRITICAL_ENDPOINT",
+          "nurse_response_success": [
+            "Farhan is stable for theatre, Doctor."
+          ],
+          "nurse_response_failure": [
+            "Doctor, despite resuscitation, we were unable to bring Farhan back."
+          ],
+          "next_decision": null,
+          "chain_status": "PATIENT_P1_CHAIN_COMPLETE"
+        },
+        {
+          "option_id": "B",
+          "text": "Leave him with no clear handover and move on.",
+          "protocol_alignment": "Incomplete handover of an unstable trauma patient",
+          "quality": "delay",
+          "outcome_if_prior_state_recoverable": "FARHAN_PARTIAL_STABILIZATION",
+          "outcome_if_prior_state_unrecoverable": "FARHAN_CRITICAL_ENDPOINT",
+          "nurse_response_partial": [
+            "He's holding for now, Doctor, but the surgical team wasn't given a clear picture."
+          ],
+          "nurse_response_failure": [
+            "Doctor, despite resuscitation, we were unable to bring Farhan back."
+          ],
+          "next_decision": null,
+          "chain_status": "PATIENT_P1_CHAIN_COMPLETE"
+        },
+        {
+          "option_id": "C",
+          "text": "Continue managing him well past the point he's stable, delaying attention to anyone else waiting.",
+          "protocol_alignment": "Fails to reprioritize once the first patient is stabilized; wastes time that another waiting patient needs",
+          "quality": "critical_error",
+          "outcome_if_prior_state_recoverable": "FARHAN_STABILIZED",
+          "outcome_if_prior_state_unrecoverable": "FARHAN_CRITICAL_ENDPOINT",
+          "nurse_response_partial": [
+            "Doctor, Farhan is fine, but we've lost time we didn't need to lose."
+          ],
+          "nurse_response_failure": [
+            "Doctor, despite resuscitation, we were unable to bring Farhan back."
+          ],
+          "next_decision": null,
+          "chain_status": "PATIENT_P1_CHAIN_COMPLETE"
+        },
+        {
+          "option_id": "D",
+          "text": "Discontinue monitoring once he looks a bit better, without confirming stability.",
+          "protocol_alignment": "Premature de-escalation of monitoring in an unstable trauma patient",
+          "quality": "critical_error",
+          "outcome_if_prior_state_recoverable": "FARHAN_PARTIAL_STABILIZATION",
+          "outcome_if_prior_state_unrecoverable": "FARHAN_CRITICAL_ENDPOINT",
+          "nurse_response_partial": [
+            "Doctor, he dipped again after we stopped monitoring -- we caught it just in time."
+          ],
+          "nurse_response_failure": [
+            "Doctor, despite resuscitation, we were unable to bring Farhan back."
+          ],
+          "next_decision": null,
+          "chain_status": "PATIENT_P1_CHAIN_COMPLETE"
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 10,
+        "resources_optimal": [
+          "monitor"
+        ]
+      },
+      "chain_terminal_node": true
+    },
+    "D1_LAKSHMI": {
+      "patient_id": "P2",
+      "applies_to_status": "STABLE_PAINFUL",
+      "nurse_dialogue": [
+        "Lakshmi's been waiting, Doctor. Her arm is still deformed and she's in a lot of pain, but her vitals have stayed normal the whole time.",
+        "What would you like to do?"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Reassess neurovascular status of the limb, give appropriate analgesia, splint the arm, and send for an X-ray.",
+          "protocol_alignment": "ESI-4-consistent management: analgesia and imaging without over-using critical resources",
+          "quality": "optimal",
+          "resource_use": [
+            "analgesic_dose",
+            "splint",
+            "radiology_slot"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "88 -> 82 (down, pain easing)",
+            "SpO2_percent": "98 -> 98 (no change)",
+            "RR_per_min": "16 -> 15 (down)",
+            "BP_mmHg": "128/82 -> 124/80 (down)"
+          },
+          "new_status": "STABLE_TREATED",
+          "nurse_response": [
+            "She's much more comfortable, Doctor. X-ray shows a simple closed fracture -- no neurovascular compromise."
+          ],
+          "next_decision": "D2_LAKSHMI"
+        },
+        {
+          "option_id": "B",
+          "text": "Tell her to keep waiting since Farhan's case was more urgent and she is stable.",
+          "protocol_alignment": "Fails to manage a patient's ongoing pain once resources are available -- pain control is part of appropriate ESI-4 care",
+          "quality": "delay",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "88 -> 94 (up, from prolonged pain)",
+            "SpO2_percent": "unchanged",
+            "RR_per_min": "16 -> 19 (up)",
+            "BP_mmHg": "128/82 -> 134/86 (up)"
+          },
+          "new_status": "STABLE_PAINFUL",
+          "nurse_response": [
+            "Doctor, she's in a lot of distress now -- we can manage her pain even though she's not the top priority."
+          ],
+          "next_decision": "D2_LAKSHMI"
+        },
+        {
+          "option_id": "C",
+          "text": "Order a full trauma CT series for her, even though her injury is an isolated limb deformity.",
+          "protocol_alignment": "Over-ordering for an isolated stable injury; resource waste",
+          "quality": "resource_waste",
+          "resource_use": [
+            "radiology_slot_ct"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "88 -> 90 (up slightly, still in pain)",
+            "SpO2_percent": "unchanged",
+            "RR_per_min": "16 -> 17 (up)",
+            "BP_mmHg": "unchanged"
+          },
+          "new_status": "STABLE_PAINFUL",
+          "nurse_response": [
+            "Doctor, the CT was unnecessary for an isolated arm injury, and it delayed her pain relief."
+          ],
+          "next_decision": "D2_LAKSHMI"
+        },
+        {
+          "option_id": "D",
+          "text": "Splint the arm immediately without checking distal pulses or sensation first.",
+          "protocol_alignment": "Skips neurovascular assessment before immobilizing a deformed limb",
+          "quality": "delay",
+          "resource_use": [
+            "splint"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "unchanged",
+            "SpO2_percent": "unchanged",
+            "RR_per_min": "unchanged",
+            "BP_mmHg": "unchanged"
+          },
+          "new_status": "STABLE_PAINFUL",
+          "nurse_response": [
+            "Doctor, we splinted it, but we should check her fingers for circulation and feeling before we finish."
+          ],
+          "next_decision": "D2_LAKSHMI"
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 10,
+        "resources_optimal": [
+          "analgesic_dose",
+          "splint",
+          "radiology_slot"
+        ]
+      }
+    },
+    "D2_LAKSHMI": {
+      "patient_id": "P2",
+      "applies_to_status": [
+        "STABLE_TREATED",
+        "STABLE_PAINFUL"
+      ],
+      "nurse_dialogue": [
+        "Her X-ray confirms a simple closed radius fracture, Doctor. What's the final plan for her?"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Confirm neurovascular status is intact, arrange orthopedic follow-up, and discharge with clear safety-netting advice.",
+          "protocol_alignment": "Appropriate ESI-4 disposition",
+          "quality": "optimal",
+          "resource_use": [],
+          "outcome": "LAKSHMI_STABILIZED",
+          "nurse_response_success": [
+            "She's comfortable and safe for discharge, Doctor, with an orthopedic follow-up booked."
+          ],
+          "next_decision": null,
+          "chain_status": "PATIENT_P2_CHAIN_COMPLETE"
+        },
+        {
+          "option_id": "B",
+          "text": "Discharge her immediately without checking circulation/sensation or arranging follow-up.",
+          "protocol_alignment": "Skips essential final checks before discharge",
+          "quality": "critical_error",
+          "resource_use": [],
+          "outcome": "LAKSHMI_PARTIAL_STABILIZATION",
+          "nurse_response_partial": [
+            "Doctor, she called back later -- her fingers had gone numb. We should have checked before discharge."
+          ],
+          "next_decision": null,
+          "chain_status": "PATIENT_P2_CHAIN_COMPLETE"
+        },
+        {
+          "option_id": "C",
+          "text": "Keep her admitted for observation despite a simple, stable closed fracture.",
+          "protocol_alignment": "Unnecessary resource use (an inpatient bed) for a condition that does not require admission",
+          "quality": "resource_waste",
+          "resource_use": [
+            "inpatient_bed"
+          ],
+          "outcome": "LAKSHMI_STABILIZED",
+          "nurse_response_success": [
+            "She's fine, Doctor, but admitting her used a bed that a sicker patient may have needed."
+          ],
+          "next_decision": null,
+          "chain_status": "PATIENT_P2_CHAIN_COMPLETE"
+        },
+        {
+          "option_id": "D",
+          "text": "Leave her splinted arm unaddressed and move on without finalizing a plan.",
+          "protocol_alignment": "No disposition plan",
+          "quality": "delay",
+          "resource_use": [],
+          "outcome": "LAKSHMI_PARTIAL_STABILIZATION",
+          "nurse_response_partial": [
+            "Doctor, she's still sitting here waiting to know what happens next."
+          ],
+          "next_decision": null,
+          "chain_status": "PATIENT_P2_CHAIN_COMPLETE"
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 8,
+        "resources_optimal": []
+      },
+      "chain_terminal_node": true
+    }
+  },
+  "flow_control": {
+    "explanation": "next_decision inside a decision option NEVER points to a different patient's chain -- it only ever points to another node within the SAME patient's decision_tree chain, or is null when that patient's chain has ended (chain_status: '<PATIENT>_CHAIN_COMPLETE' / a node flagged chain_terminal_node: true). Movement between patients is controlled ONLY by the sequence below, driven by the game engine, never by an option's own next_decision.",
+    "sequence": [
+      {
+        "step": 1,
+        "node": "D0_TRIAGE",
+        "type": "pre_patient_decision",
+        "on_complete": "advance to step 2 (engine reads the chosen patient order from D0_TRIAGE's effect, but gameplay always resolves P1's full chain before P2's)"
+      },
+      {
+        "step": 2,
+        "patient_id": "P1",
+        "chain_start": "D1_FARHAN",
+        "chain_end_flag": "PATIENT_P1_CHAIN_COMPLETE",
+        "on_chain_complete": "advance to step 3"
+      },
+      {
+        "step": 3,
+        "patient_id": "P2",
+        "chain_start": "D1_LAKSHMI",
+        "chain_end_flag": "PATIENT_P2_CHAIN_COMPLETE",
+        "on_chain_complete": "level complete -> evaluate endings.combined_outcome_logic"
+      }
+    ]
+  },
+  "endings": {
+    "FARHAN_STABILIZED": {
+      "status_code": "SUCCESS",
+      "banner": "FARHAN STABILIZED"
+    },
+    "FARHAN_PARTIAL_STABILIZATION": {
+      "status_code": "SUCCESS_WITH_PENALTY",
+      "banner": "FARHAN STABILIZED (SUBOPTIMAL HANDOVER)"
+    },
+    "FARHAN_CRITICAL_ENDPOINT": {
+      "status_code": "FAILURE",
+      "banner": "FARHAN - UNSUCCESSFUL OUTCOME"
+    },
+    "LAKSHMI_STABILIZED": {
+      "status_code": "SUCCESS",
+      "banner": "LAKSHMI STABILIZED"
+    },
+    "LAKSHMI_PARTIAL_STABILIZATION": {
+      "status_code": "SUCCESS_WITH_PENALTY",
+      "banner": "LAKSHMI STABILIZED (INCOMPLETE CARE)"
+    },
+    "combined_outcome_logic": "Level 3 is complete once both FARHAN_* and LAKSHMI_* outcomes are reached. Overall level result = SUCCESS only if both patients reach a STABILIZED or PARTIAL_STABILIZATION outcome; overall level result = FAILURE if either patient reaches a CRITICAL_ENDPOINT."
+  },
+  "performance_report_schema": {
+    "decision_history": [
+      {
+        "decision_id": "string",
+        "patient_id": "string",
+        "action_text": "string",
+        "quality": "optimal|delay|resource_waste|critical_error",
+        "patient_status_before": "string",
+        "patient_status_after": "string",
+        "time_taken_seconds": "number (runtime)",
+        "expected_seconds": "number (authored)"
+      }
+    ],
+    "triage_accuracy": "boolean - whether D0_TRIAGE option A (correct ESI-based prioritization) was selected",
+    "final_outcome_per_patient": {
+      "P1": "FARHAN_* outcome",
+      "P2": "LAKSHMI_* outcome"
+    },
+    "score_components": [
+      "triage_accuracy",
+      "decision_quality",
+      "response_time",
+      "protocol_adherence_esi"
+    ]
+  }
+}

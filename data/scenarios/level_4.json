@@ -1,0 +1,1100 @@
+{
+  "level_id": 4,
+  "level_name": "Mass Casualty",
+  "codename": "EmergIQ - Mass Casualty",
+  "difficulty": "Hard",
+  "patient_count": 6,
+  "main_skill": "Manage multiple patients: rapid assessment, triage/prioritization, treatment order, changing conditions",
+  "core_question": "Who needs attention first among many patients?",
+  "protocol_reference": [
+    {
+      "primary_source": "start_triage.json",
+      "attribution": "MCI Triage (START algorithm)",
+      "usage_note": "The TRIAGE_SWEEP decisions follow the START flow: can the patient walk? -> is the patient breathing (after airway repositioning if needed)? -> respiratory rate above/below 30? -> perfusion (radial pulse / capillary refill)? -> mental status (obeys commands)? Categories: IMMEDIATE (red), DELAYED (yellow), MINOR (green), EXPECTANT (black/grey)."
+    },
+    {
+      "primary_source": "national_trauma_triage_protocol.json",
+      "attribution": "CDC MMWR Guidelines for Field Triage of Injured Patients",
+      "usage_note": "Treatment-order and resource-allocation decisions after triage follow CDC field-triage logic: physiologic criteria (airway, breathing, circulation, mental status) determine who is transported/treated first among multiple IMMEDIATE patients."
+    }
+  ],
+  "note": "All names, vitals, and clinical details below are entirely fictional training content generated for simulation purposes. This scenario depicts a fictional mass-casualty incident (multi-vehicle bus collision) for emergency-triage training only.",
+  "scope_note": "Given 6 simultaneous patients, each carries one triage decision plus one condensed management decision (rather than the 4-decision depth used for single-patient Level 1) so the level remains playable within a mass-casualty time pressure window. Every decision still offers 4 fully-branched options with distinct consequences.",
+  "resource_pool_at_level_start": {
+    "trauma_bays": 3,
+    "oxygen_cylinders": 2,
+    "iv_fluid_bags": 4,
+    "tourniquets": 2,
+    "airway_adjuncts": 3,
+    "spinal_boards": 2,
+    "transport_ambulances_available": 2
+  },
+  "intro_sequence": {
+    "phase_1_nurse_intro": {
+      "character": "Nurse Maya",
+      "dialogue": [
+        "Doctor, a multi-vehicle bus collision just brought in six patients at once.",
+        "We don't have time to fully examine everyone. We need to triage fast and treat in the right order.",
+        "I'll call out each patient as they come in -- tell me their triage category and then how we manage them."
+      ]
+    }
+  },
+  "patients": [
+    {
+      "patient_id": "P1",
+      "name": "Vikram Nair",
+      "age": 34,
+      "sex": "Male",
+      "chief_complaint": "Crush injury to right leg, was pinned under a seat",
+      "initial_vitals": {
+        "HR_bpm": 128,
+        "SpO2_percent": 93,
+        "RR_per_min": 32,
+        "BP_mmHg": "96/60",
+        "consciousness": "Alert, in severe pain",
+        "radial_pulse": "weak",
+        "cap_refill_sec": 3
+      },
+      "medical_report": {
+        "patient_id": "RKEMC-2026-MCI-01",
+        "name": "Vikram Nair",
+        "age": 34,
+        "sex": "Male",
+        "blood_group": "O-",
+        "known_allergies": "None reported",
+        "past_medical_history": "Nil significant",
+        "vitals_on_arrival": {
+          "HR_bpm": 128,
+          "SpO2_percent": 93,
+          "RR_per_min": 32,
+          "BP_mmHg": "96/60",
+          "GCS": "15/15"
+        },
+        "injury_summary": "Open crush injury right lower leg with active bleeding, RR 32/min",
+        "correct_start_category": "IMMEDIATE"
+      }
+    },
+    {
+      "patient_id": "P2",
+      "name": "Ananya Rao",
+      "age": 29,
+      "sex": "Female",
+      "chief_complaint": "Laceration to left forearm, walked in from the scene",
+      "initial_vitals": {
+        "HR_bpm": 94,
+        "SpO2_percent": 98,
+        "RR_per_min": 18,
+        "BP_mmHg": "122/78",
+        "consciousness": "Alert",
+        "radial_pulse": "normal",
+        "cap_refill_sec": 1
+      },
+      "medical_report": {
+        "patient_id": "RKEMC-2026-MCI-02",
+        "name": "Ananya Rao",
+        "age": 29,
+        "sex": "Female",
+        "blood_group": "A+",
+        "known_allergies": "None reported",
+        "past_medical_history": "Nil significant",
+        "vitals_on_arrival": {
+          "HR_bpm": 94,
+          "SpO2_percent": 98,
+          "RR_per_min": 18,
+          "BP_mmHg": "122/78",
+          "GCS": "15/15"
+        },
+        "injury_summary": "Ambulatory, 6cm laceration left forearm, mild ongoing oozing",
+        "correct_start_category": "MINOR"
+      }
+    },
+    {
+      "patient_id": "P3",
+      "name": "Deepak Menon",
+      "age": 45,
+      "sex": "Male",
+      "chief_complaint": "Found unresponsive, not breathing on arrival",
+      "initial_vitals": {
+        "HR_bpm": 0,
+        "SpO2_percent": null,
+        "RR_per_min": 0,
+        "BP_mmHg": "unrecordable",
+        "consciousness": "Unresponsive",
+        "note": "Begins breathing spontaneously (RR 8, shallow) once airway is repositioned"
+      },
+      "medical_report": {
+        "patient_id": "RKEMC-2026-MCI-03",
+        "name": "Deepak Menon",
+        "age": 45,
+        "sex": "Male",
+        "blood_group": "B-",
+        "known_allergies": "Unknown",
+        "past_medical_history": "Unknown (unresponsive, no accompanying family yet)",
+        "vitals_on_arrival": {
+          "HR_bpm": "impalpable initially, 112 after repositioning",
+          "SpO2_percent": "unrecordable initially, 88 after repositioning",
+          "RR_per_min": "0, then 8 after airway reposition",
+          "BP_mmHg": "84/50 after repositioning",
+          "GCS": "8/15 (E2V2M4)"
+        },
+        "injury_summary": "Head injury, airway obstructed by positioning, breathes only after jaw-thrust/reposition",
+        "correct_start_category": "IMMEDIATE"
+      }
+    },
+    {
+      "patient_id": "P4",
+      "name": "Priya Krishnan",
+      "age": 8,
+      "sex": "Female",
+      "chief_complaint": "Confused, not following commands, minor visible injuries",
+      "initial_vitals": {
+        "HR_bpm": 118,
+        "SpO2_percent": 95,
+        "RR_per_min": 24,
+        "BP_mmHg": "88/58",
+        "consciousness": "Disoriented, does not obey commands",
+        "radial_pulse": "present",
+        "cap_refill_sec": 3
+      },
+      "medical_report": {
+        "patient_id": "RKEMC-2026-MCI-04",
+        "name": "Priya Krishnan",
+        "age": 8,
+        "sex": "Female",
+        "blood_group": "AB+",
+        "known_allergies": "None reported",
+        "past_medical_history": "Nil significant",
+        "vitals_on_arrival": {
+          "HR_bpm": 118,
+          "SpO2_percent": 95,
+          "RR_per_min": 24,
+          "BP_mmHg": "88/58",
+          "GCS": "13/15"
+        },
+        "injury_summary": "Suspected head injury, disoriented, delayed capillary refill suggesting evolving shock",
+        "correct_start_category": "IMMEDIATE"
+      }
+    },
+    {
+      "patient_id": "P5",
+      "name": "Ravi Chandran",
+      "age": 60,
+      "sex": "Male",
+      "chief_complaint": "Chest wall pain, breathing normally, alert",
+      "initial_vitals": {
+        "HR_bpm": 100,
+        "SpO2_percent": 96,
+        "RR_per_min": 20,
+        "BP_mmHg": "138/86",
+        "consciousness": "Alert, obeys commands",
+        "radial_pulse": "present",
+        "cap_refill_sec": 2
+      },
+      "medical_report": {
+        "patient_id": "RKEMC-2026-MCI-05",
+        "name": "Ravi Chandran",
+        "age": 60,
+        "sex": "Male",
+        "blood_group": "O+",
+        "known_allergies": "Sulfa drugs",
+        "past_medical_history": "Hypertension",
+        "vitals_on_arrival": {
+          "HR_bpm": 100,
+          "SpO2_percent": 96,
+          "RR_per_min": 20,
+          "BP_mmHg": "138/86",
+          "GCS": "15/15"
+        },
+        "injury_summary": "Suspected rib fractures, unable to walk due to pain but physiologically stable",
+        "correct_start_category": "DELAYED"
+      }
+    },
+    {
+      "patient_id": "P6",
+      "name": "Suresh Pillai",
+      "age": 52,
+      "sex": "Male",
+      "chief_complaint": "Found not breathing, no pulse, no response to airway repositioning",
+      "initial_vitals": {
+        "HR_bpm": 0,
+        "SpO2_percent": null,
+        "RR_per_min": 0,
+        "BP_mmHg": "unrecordable",
+        "consciousness": "Unresponsive"
+      },
+      "medical_report": {
+        "patient_id": "RKEMC-2026-MCI-06",
+        "name": "Suresh Pillai",
+        "age": 52,
+        "sex": "Male",
+        "blood_group": "Unknown",
+        "known_allergies": "Unknown",
+        "past_medical_history": "Unknown",
+        "vitals_on_arrival": {
+          "HR_bpm": 0,
+          "SpO2_percent": "unrecordable",
+          "RR_per_min": "0, remains apneic after airway reposition",
+          "BP_mmHg": "unrecordable",
+          "GCS": "3/15"
+        },
+        "injury_summary": "Apneic and pulseless despite airway repositioning",
+        "correct_start_category": "EXPECTANT"
+      }
+    }
+  ],
+  "decision_tree": {
+    "TRIAGE_SWEEP": {
+      "instruction": "Assign a START triage category to each of the 6 patients before treatment begins. Each patient is its own decision node below; the engine should present them together as one rapid-fire sweep.",
+      "patients": {
+        "P1_TRIAGE": {
+          "patient_id": "P1",
+          "nurse_dialogue": [
+            "Vikram can't walk -- he's pinned and bleeding, breathing fast at 32, and his radial pulse is weak.",
+            "What's his triage category?"
+          ],
+          "options": [
+            {
+              "option_id": "A",
+              "text": "IMMEDIATE (Red) -- RR over 30 with weak perfusion.",
+              "quality": "optimal",
+              "protocol_alignment": "START: RR>30 = Immediate",
+              "consequence": "Correctly flagged for first-wave resource allocation."
+            },
+            {
+              "option_id": "B",
+              "text": "DELAYED (Yellow) -- he's talking, so he can wait.",
+              "quality": "critical_error",
+              "protocol_alignment": "Ignores RR>30 criterion; a talking patient can still be physiologically Immediate",
+              "consequence": "Vikram's leg bleeding continues untreated for longer than it should; he deteriorates toward hypovolemic shock before reassessment."
+            },
+            {
+              "option_id": "C",
+              "text": "MINOR (Green) -- his injury is only to one limb.",
+              "quality": "critical_error",
+              "protocol_alignment": "Ignores respiratory rate and perfusion signs entirely",
+              "consequence": "Severe misclassification -- Vikram is left in the minor-injuries area and continues bleeding unmonitored."
+            },
+            {
+              "option_id": "D",
+              "text": "EXPECTANT (Black/Grey) -- his injuries look too severe to save.",
+              "quality": "critical_error",
+              "protocol_alignment": "Incorrect use of the expectant category; Vikram is breathing, has a pulse, and is salvageable",
+              "consequence": "A salvageable patient is wrongly deprioritized out of active care."
+            }
+          ]
+        },
+        "P2_TRIAGE": {
+          "patient_id": "P2",
+          "nurse_dialogue": [
+            "Ananya walked in herself with a cut arm. She's alert and talking normally.",
+            "What's her triage category?"
+          ],
+          "options": [
+            {
+              "option_id": "A",
+              "text": "MINOR (Green) -- ambulatory with a stable, isolated injury.",
+              "quality": "optimal",
+              "protocol_alignment": "START: able to walk = Minor",
+              "consequence": "Correctly directed to the minor-treatment area, freeing bay capacity for higher-acuity patients."
+            },
+            {
+              "option_id": "B",
+              "text": "IMMEDIATE (Red) -- any visible bleeding should be Red.",
+              "quality": "resource_waste",
+              "protocol_alignment": "Over-triage; ties up a trauma bay for a walking, stable patient",
+              "consequence": "A trauma bay is occupied unnecessarily while Immediate patients wait."
+            },
+            {
+              "option_id": "C",
+              "text": "DELAYED (Yellow) -- she'll need stitches eventually.",
+              "quality": "delay",
+              "protocol_alignment": "Minor over-triage; she qualifies as Minor, not Delayed",
+              "consequence": "Minor over-triage; not dangerous, but slightly inefficient use of the delayed queue."
+            },
+            {
+              "option_id": "D",
+              "text": "EXPECTANT (Black/Grey) -- deprioritize since she is stable.",
+              "quality": "critical_error",
+              "protocol_alignment": "Severe misuse of the expectant category for a stable walking patient",
+              "consequence": "Alarming misclassification; would abandon a clearly salvageable, low-acuity patient."
+            }
+          ]
+        },
+        "P3_TRIAGE": {
+          "patient_id": "P3",
+          "nurse_dialogue": [
+            "Deepak wasn't breathing at all, Doctor. After we repositioned his airway, he started breathing again -- shallow, about 8 a minute.",
+            "What's his triage category?"
+          ],
+          "options": [
+            {
+              "option_id": "A",
+              "text": "IMMEDIATE (Red) -- breathes only after airway repositioning.",
+              "quality": "optimal",
+              "protocol_alignment": "START: apneic patient who breathes after repositioning = Immediate",
+              "consequence": "Correctly flagged as the highest priority for airway management and resuscitation."
+            },
+            {
+              "option_id": "B",
+              "text": "EXPECTANT (Black/Grey) -- he wasn't breathing, so he's not salvageable.",
+              "quality": "critical_error",
+              "protocol_alignment": "Misapplies Expectant; per START, breathing after repositioning is a defining feature of Immediate, not Expectant",
+              "consequence": "A salvageable patient with an obstructed airway is wrongly written off."
+            },
+            {
+              "option_id": "C",
+              "text": "DELAYED (Yellow) -- he's breathing now, so he can wait.",
+              "quality": "critical_error",
+              "protocol_alignment": "Ignores that breathing only resumed after intervention -- a hallmark Immediate criterion",
+              "consequence": "His shallow breathing goes unmanaged and he deteriorates toward respiratory arrest again."
+            },
+            {
+              "option_id": "D",
+              "text": "MINOR (Green) -- he's breathing on his own now.",
+              "quality": "critical_error",
+              "protocol_alignment": "Severe misclassification of a patient who required airway intervention to breathe at all",
+              "consequence": "Critical delay in reaching a patient who needs immediate airway support."
+            }
+          ]
+        },
+        "P4_TRIAGE": {
+          "patient_id": "P4",
+          "nurse_dialogue": [
+            "Priya is 8. She won't follow simple commands and seems confused, but her injuries look minor.",
+            "What's her triage category?"
+          ],
+          "options": [
+            {
+              "option_id": "A",
+              "text": "IMMEDIATE (Red) -- fails the mental status / obeys-commands check.",
+              "quality": "optimal",
+              "protocol_alignment": "START: altered mental status (does not obey commands) = Immediate, regardless of visible injury severity",
+              "consequence": "Correctly prioritized -- her delayed capillary refill and confusion suggest evolving shock or head injury that visible injuries alone would miss."
+            },
+            {
+              "option_id": "B",
+              "text": "MINOR (Green) -- her visible injuries are minor.",
+              "quality": "critical_error",
+              "protocol_alignment": "Ignores the mental-status criterion entirely, the most sensitive marker in a pediatric patient",
+              "consequence": "A deteriorating pediatric patient is left unmonitored in the minor area."
+            },
+            {
+              "option_id": "C",
+              "text": "DELAYED (Yellow) -- she can wait since she's not bleeding heavily.",
+              "quality": "critical_error",
+              "protocol_alignment": "Misses the altered-mental-status Immediate criterion",
+              "consequence": "Delayed recognition of a likely head injury or shock state in a child."
+            },
+            {
+              "option_id": "D",
+              "text": "EXPECTANT (Black/Grey) -- confusion suggests a severe untreatable injury.",
+              "quality": "critical_error",
+              "protocol_alignment": "Wildly premature use of the expectant category on a breathing, pulse-present child",
+              "consequence": "Serious misclassification; she is fully salvageable with prompt care."
+            }
+          ]
+        },
+        "P5_TRIAGE": {
+          "patient_id": "P5",
+          "nurse_dialogue": [
+            "Ravi has chest wall pain and can't walk because of it, but he's breathing normally, has a good pulse, and is answering questions clearly.",
+            "What's his triage category?"
+          ],
+          "options": [
+            {
+              "option_id": "A",
+              "text": "DELAYED (Yellow) -- normal RR, present pulse, obeys commands, but cannot walk.",
+              "quality": "optimal",
+              "protocol_alignment": "START: normal breathing/perfusion/mental status but non-ambulatory = Delayed",
+              "consequence": "Correctly placed in the Delayed queue -- monitored, but not competing with Immediate patients for the first wave of resources."
+            },
+            {
+              "option_id": "B",
+              "text": "IMMEDIATE (Red) -- chest pain always means Immediate.",
+              "quality": "resource_waste",
+              "protocol_alignment": "Over-triage; his physiologic criteria (RR, perfusion, mental status) all meet Delayed thresholds",
+              "consequence": "A trauma bay and scarce first-wave resources are consumed by a physiologically stable patient."
+            },
+            {
+              "option_id": "C",
+              "text": "MINOR (Green) -- he's stable, so treat him like a walking wounded.",
+              "quality": "critical_error",
+              "protocol_alignment": "Ignores that he cannot walk, the key criterion excluding Minor",
+              "consequence": "He is placed with ambulatory patients despite being unable to walk, risking him being overlooked."
+            },
+            {
+              "option_id": "D",
+              "text": "EXPECTANT (Black/Grey) -- his age puts him at higher risk.",
+              "quality": "critical_error",
+              "protocol_alignment": "Age is not a START criterion; this misclassifies a stable, salvageable patient",
+              "consequence": "Inappropriate and unjustified deprioritization."
+            }
+          ]
+        },
+        "P6_TRIAGE": {
+          "patient_id": "P6",
+          "nurse_dialogue": [
+            "Suresh isn't breathing, Doctor, even after we repositioned his airway. No pulse either.",
+            "What's his triage category?"
+          ],
+          "options": [
+            {
+              "option_id": "A",
+              "text": "EXPECTANT (Black/Grey) -- apneic and pulseless despite airway repositioning.",
+              "quality": "optimal",
+              "protocol_alignment": "START: remains apneic after repositioning = Expectant in a resource-constrained MCI",
+              "consequence": "Correctly and difficultly categorized; resources are preserved for salvageable patients, and comfort-focused care is arranged for Suresh where possible."
+            },
+            {
+              "option_id": "B",
+              "text": "IMMEDIATE (Red) -- attempt full resuscitation regardless of resource strain.",
+              "quality": "resource_waste",
+              "protocol_alignment": "In a true MCI with overwhelmed resources, START directs personnel away from patients who remain apneic after repositioning, to save the greatest number of salvageable patients overall",
+              "consequence": "Diverts the team's only spare hands from three other Immediate patients who are still salvageable, at significant cost to overall survival."
+            },
+            {
+              "option_id": "C",
+              "text": "DELAYED (Yellow) -- reassess him again in a few minutes.",
+              "quality": "critical_error",
+              "protocol_alignment": "Miscategorization -- he does not meet any Delayed criteria",
+              "consequence": "Wastes time that should go to salvageable patients without changing his outcome."
+            },
+            {
+              "option_id": "D",
+              "text": "MINOR (Green) -- skip him and move on without any categorization.",
+              "quality": "delay",
+              "protocol_alignment": "Fails to formally record his status, which affects the incident log and family communication",
+              "consequence": "No immediate clinical harm, but creates confusion in the incident record."
+            }
+          ]
+        }
+      },
+      "evaluator": {
+        "expected_seconds_per_patient": 8,
+        "note": "START triage is designed to take under 30 seconds per patient in real practice; the 8-second target reflects the compressed pace of the simulation."
+      }
+    },
+    "TREATMENT_ORDER": {
+      "nurse_dialogue": [
+        "We have three IMMEDIATE patients now: Vikram, Deepak, and Priya. We only have enough hands to fully manage them one at a time before the next ambulance crew arrives to help.",
+        "What order do you want to treat them in?"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Deepak first (airway is the most immediately life-threatening problem), then Priya (evolving shock/head injury), then Vikram (ongoing but currently controllable bleeding).",
+          "quality": "optimal",
+          "protocol_alignment": "CDC field-triage logic: airway compromise takes precedence over evolving-but-currently-compensated shock and controllable external hemorrhage",
+          "consequence": "All three IMMEDIATE patients receive timely care in physiologically sound order."
+        },
+        {
+          "option_id": "B",
+          "text": "Vikram first (visible bleeding is most alarming), then Deepak, then Priya.",
+          "quality": "critical_error",
+          "protocol_alignment": "Prioritizes visible bleeding over an unmanaged airway problem, which is a higher physiologic threat",
+          "consequence": "Deepak's shallow breathing goes unsupported for longer, risking a second respiratory arrest while Vikram's bleeding -- already partly controlled by a pressure dressing -- is treated first."
+        },
+        {
+          "option_id": "C",
+          "text": "Priya first (she's a child), then Vikram, then Deepak.",
+          "quality": "critical_error",
+          "protocol_alignment": "Prioritizes by age/emotional salience rather than physiologic threat; Deepak's airway is the more time-critical problem",
+          "consequence": "Deepak deteriorates further while airway support is delayed."
+        },
+        {
+          "option_id": "D",
+          "text": "Treat whichever patient is closest, without applying any prioritization logic.",
+          "quality": "critical_error",
+          "protocol_alignment": "No physiologic prioritization applied",
+          "consequence": "Random treatment order leads to unpredictable, and on average worse, outcomes across the three patients."
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 10
+      }
+    },
+    "P3_MANAGEMENT": {
+      "patient_id": "P3",
+      "nurse_dialogue": [
+        "Deepak's airway is our first priority, Doctor. What would you like to do?"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Insert an airway adjunct, provide bag-valve-mask ventilation with high-flow oxygen, and reassess breathing continuously.",
+          "quality": "optimal",
+          "resource_use": [
+            "airway_adjuncts",
+            "oxygen_cylinders"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "-> 108 (stabilizing)",
+            "SpO2_percent": "-> 92 (up)",
+            "RR_per_min": "supported at 14/min via BVM",
+            "BP_mmHg": "-> 92/58 (improving)"
+          },
+          "new_status": "STABILIZED",
+          "nurse_response": [
+            "He's oxygenating better, Doctor. Airway secured for transport."
+          ]
+        },
+        {
+          "option_id": "B",
+          "text": "Leave him on his back without repositioning and move to the next patient.",
+          "quality": "critical_error",
+          "vitals_delta": {
+            "HR_bpm": "declining",
+            "SpO2_percent": "declining",
+            "RR_per_min": "declining toward apnea again",
+            "BP_mmHg": "declining"
+          },
+          "new_status": "CRITICAL_ENDPOINT",
+          "nurse_response": [
+            "Doctor, he's stopped breathing again -- we lost the airway."
+          ]
+        },
+        {
+          "option_id": "C",
+          "text": "Wait for the second ambulance crew to arrive before doing anything.",
+          "quality": "critical_error",
+          "vitals_delta": {
+            "HR_bpm": "declining",
+            "SpO2_percent": "declining",
+            "RR_per_min": "declining",
+            "BP_mmHg": "declining"
+          },
+          "new_status": "CRITICAL_ENDPOINT",
+          "nurse_response": [
+            "Doctor, we can't wait -- his airway needs attention now."
+          ]
+        },
+        {
+          "option_id": "D",
+          "text": "Focus only on IV fluids without addressing the airway.",
+          "quality": "critical_error",
+          "resource_use": [
+            "iv_fluid_bags"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "unstable",
+            "SpO2_percent": "declining",
+            "RR_per_min": "declining",
+            "BP_mmHg": "unstable"
+          },
+          "new_status": "CRITICAL_ENDPOINT",
+          "nurse_response": [
+            "Doctor, fluids won't help if he can't breathe -- his airway needed to come first."
+          ]
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 15,
+        "resources_optimal": [
+          "airway_adjuncts",
+          "oxygen_cylinders"
+        ]
+      }
+    },
+    "P4_MANAGEMENT": {
+      "patient_id": "P4",
+      "nurse_dialogue": [
+        "Priya's confusion hasn't improved, and her capillary refill is still slow, Doctor. What would you like to do?"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Secure IV access, give a fluid bolus for suspected compensated shock, apply oxygen, and prepare for urgent imaging once stabilized.",
+          "quality": "optimal",
+          "resource_use": [
+            "iv_fluid_bags",
+            "oxygen_cylinders"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "-> 106 (down)",
+            "SpO2_percent": "-> 97 (up)",
+            "RR_per_min": "-> 20 (down)",
+            "BP_mmHg": "-> 98/64 (up)"
+          },
+          "new_status": "STABILIZED",
+          "nurse_response": [
+            "She's more responsive now, Doctor -- following simple commands again."
+          ]
+        },
+        {
+          "option_id": "B",
+          "text": "Assume the confusion is just fear and offer reassurance only.",
+          "quality": "critical_error",
+          "vitals_delta": {
+            "HR_bpm": "up",
+            "SpO2_percent": "down",
+            "RR_per_min": "up",
+            "BP_mmHg": "down"
+          },
+          "new_status": "CRITICAL_ENDPOINT",
+          "nurse_response": [
+            "Doctor, she's becoming less responsive -- this wasn't just fear."
+          ]
+        },
+        {
+          "option_id": "C",
+          "text": "Send her for a full-body CT scan immediately without stabilizing her first.",
+          "quality": "critical_error",
+          "resource_use": [
+            "radiology_slot_ct"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "up",
+            "SpO2_percent": "down",
+            "RR_per_min": "up",
+            "BP_mmHg": "down"
+          },
+          "new_status": "CRITICAL_ENDPOINT",
+          "nurse_response": [
+            "Doctor, she deteriorated in the scanner -- she needed stabilizing first."
+          ]
+        },
+        {
+          "option_id": "D",
+          "text": "Move her to the minor-injuries area since her external injuries look small.",
+          "quality": "critical_error",
+          "vitals_delta": {
+            "HR_bpm": "up",
+            "SpO2_percent": "down",
+            "RR_per_min": "up",
+            "BP_mmHg": "down"
+          },
+          "new_status": "CRITICAL_ENDPOINT",
+          "nurse_response": [
+            "Doctor, she's not safe in the minor area -- she needed monitoring."
+          ]
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 15,
+        "resources_optimal": [
+          "iv_fluid_bags",
+          "oxygen_cylinders"
+        ]
+      }
+    },
+    "P1_MANAGEMENT": {
+      "patient_id": "P1",
+      "nurse_dialogue": [
+        "Vikram's leg is still bleeding, Doctor. What would you like to do?"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Apply a tourniquet above the wound, secure IV access, give fluids, and prepare for urgent orthopedic/surgical handover.",
+          "quality": "optimal",
+          "resource_use": [
+            "tourniquets",
+            "iv_fluid_bags"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "-> 110 (down)",
+            "SpO2_percent": "-> 96 (up)",
+            "RR_per_min": "-> 24 (down)",
+            "BP_mmHg": "-> 108/70 (up)"
+          },
+          "new_status": "STABILIZED",
+          "nurse_response": [
+            "Bleeding's controlled, Doctor. He's ready for the surgical team."
+          ]
+        },
+        {
+          "option_id": "B",
+          "text": "Apply a simple gauze dressing without pressure and move on.",
+          "quality": "critical_error",
+          "vitals_delta": {
+            "HR_bpm": "up",
+            "SpO2_percent": "down",
+            "RR_per_min": "up",
+            "BP_mmHg": "down"
+          },
+          "new_status": "CRITICAL_ENDPOINT",
+          "nurse_response": [
+            "Doctor, the bleeding hasn't stopped -- he's getting paler."
+          ]
+        },
+        {
+          "option_id": "C",
+          "text": "Wait for X-ray results before addressing the bleeding.",
+          "quality": "critical_error",
+          "vitals_delta": {
+            "HR_bpm": "up",
+            "SpO2_percent": "down",
+            "RR_per_min": "up",
+            "BP_mmHg": "down"
+          },
+          "new_status": "CRITICAL_ENDPOINT",
+          "nurse_response": [
+            "Doctor, we can't wait on imaging -- the bleeding needs to be controlled now."
+          ]
+        },
+        {
+          "option_id": "D",
+          "text": "Use both remaining tourniquets on him 'to be safe', even though one is sufficient.",
+          "quality": "resource_waste",
+          "resource_use": [
+            "tourniquets",
+            "tourniquets"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "-> 112 (down)",
+            "SpO2_percent": "-> 95 (up)",
+            "RR_per_min": "-> 25 (down)",
+            "BP_mmHg": "-> 105/68 (up)"
+          },
+          "new_status": "STABILIZED_RESOURCE_INEFFICIENT",
+          "nurse_response": [
+            "Bleeding's controlled, Doctor, but now we have no tourniquets left for anyone else."
+          ]
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 12,
+        "resources_optimal": [
+          "tourniquets",
+          "iv_fluid_bags"
+        ]
+      }
+    },
+    "P5_MANAGEMENT": {
+      "patient_id": "P5",
+      "nurse_dialogue": [
+        "Ravi's still stable but in pain and can't walk, Doctor. What would you like to do for him in the Delayed queue?"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Give appropriate analgesia, place on a spinal board for safe transfer, and reassess vitals every few minutes while Immediate patients are managed.",
+          "quality": "optimal",
+          "resource_use": [
+            "spinal_boards"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "down",
+            "SpO2_percent": "stable",
+            "RR_per_min": "stable",
+            "BP_mmHg": "stable"
+          },
+          "new_status": "STABLE_TREATED",
+          "nurse_response": [
+            "He's more comfortable, Doctor, and ready for transfer when a bay opens up."
+          ]
+        },
+        {
+          "option_id": "B",
+          "text": "Leave him completely unattended until every Immediate patient is finished.",
+          "quality": "delay",
+          "vitals_delta": {
+            "HR_bpm": "up slightly",
+            "SpO2_percent": "stable",
+            "RR_per_min": "up slightly",
+            "BP_mmHg": "up slightly"
+          },
+          "new_status": "STABLE_PAINFUL",
+          "nurse_response": [
+            "He's still stable, Doctor, but in a lot of pain from waiting so long."
+          ]
+        },
+        {
+          "option_id": "C",
+          "text": "Pull a trauma bay and full monitoring resources for him despite his Delayed status.",
+          "quality": "resource_waste",
+          "resource_use": [
+            "trauma_bays"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "stable",
+            "SpO2_percent": "stable",
+            "RR_per_min": "stable",
+            "BP_mmHg": "stable"
+          },
+          "new_status": "STABLE_TREATED",
+          "nurse_response": [
+            "He's comfortable, Doctor, but that trauma bay was needed for an Immediate patient."
+          ]
+        },
+        {
+          "option_id": "D",
+          "text": "Send him home to rest since he is talking normally.",
+          "quality": "critical_error",
+          "vitals_delta": {
+            "HR_bpm": "unknown, unmonitored",
+            "SpO2_percent": "unknown",
+            "RR_per_min": "unknown",
+            "BP_mmHg": "unknown"
+          },
+          "new_status": "CRITICAL_ENDPOINT",
+          "nurse_response": [
+            "Doctor, he collapsed at home -- his rib injury needed proper evaluation before discharge."
+          ]
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 8,
+        "resources_optimal": [
+          "spinal_boards"
+        ]
+      }
+    },
+    "P2_MANAGEMENT": {
+      "patient_id": "P2",
+      "nurse_dialogue": [
+        "Ananya's laceration is still oozing, Doctor. What would you like to do for her in the Minor queue?"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Clean and dress the wound, check tetanus status, and arrange suturing once an Immediate/Delayed bay is free.",
+          "quality": "optimal",
+          "vitals_delta": {
+            "HR_bpm": "stable",
+            "SpO2_percent": "stable",
+            "RR_per_min": "stable",
+            "BP_mmHg": "stable"
+          },
+          "new_status": "STABLE_TREATED",
+          "nurse_response": [
+            "Wound's dressed and clean, Doctor. She's comfortable waiting for suturing."
+          ]
+        },
+        {
+          "option_id": "B",
+          "text": "Ignore her entirely until every other patient is fully finished.",
+          "quality": "delay",
+          "vitals_delta": {
+            "HR_bpm": "stable",
+            "SpO2_percent": "stable",
+            "RR_per_min": "stable",
+            "BP_mmHg": "stable"
+          },
+          "new_status": "STABLE_UNTREATED",
+          "nurse_response": [
+            "She's stable, Doctor, but her wound is still open and at risk of infection the longer it waits."
+          ]
+        },
+        {
+          "option_id": "C",
+          "text": "Pull a trauma bay and continuous monitoring for her despite her Minor status.",
+          "quality": "resource_waste",
+          "resource_use": [
+            "trauma_bays"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "stable",
+            "SpO2_percent": "stable",
+            "RR_per_min": "stable",
+            "BP_mmHg": "stable"
+          },
+          "new_status": "STABLE_TREATED",
+          "nurse_response": [
+            "She's fine, Doctor, but that bay was needed elsewhere."
+          ]
+        },
+        {
+          "option_id": "D",
+          "text": "Discharge her immediately without dressing the wound or checking tetanus status.",
+          "quality": "critical_error",
+          "vitals_delta": {
+            "HR_bpm": "stable",
+            "SpO2_percent": "stable",
+            "RR_per_min": "stable",
+            "BP_mmHg": "stable"
+          },
+          "new_status": "PARTIAL_STABILIZATION",
+          "nurse_response": [
+            "Doctor, she came back later with an infected wound -- we should have dressed it properly before she left."
+          ]
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 6,
+        "resources_optimal": []
+      }
+    },
+    "P6_MANAGEMENT": {
+      "patient_id": "P6",
+      "nurse_dialogue": [
+        "Suresh has been categorized Expectant, Doctor. How do you want to handle him given how stretched we are?"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Assign him brief, dignified comfort measures where possible, document his status clearly, and keep the team's active resources focused on the salvageable Immediate patients.",
+          "quality": "optimal",
+          "protocol_alignment": "Standard MCI practice: Expectant patients receive comfort-focused attention without diverting scarce active-resuscitation resources from salvageable patients",
+          "vitals_delta": null,
+          "new_status": "EXPECTANT_MANAGED",
+          "nurse_response": [
+            "Understood, Doctor. I'll note his status and check on him between the other patients."
+          ]
+        },
+        {
+          "option_id": "B",
+          "text": "Commit the team's only spare hands to full resuscitation on him for as long as it takes.",
+          "quality": "resource_waste",
+          "protocol_alignment": "Diverts limited personnel from salvageable Immediate patients in a true resource-overwhelmed MCI, reducing overall survivors",
+          "vitals_delta": null,
+          "new_status": "EXPECTANT_MANAGED",
+          "nurse_response": [
+            "Doctor, while we were with him, Priya's condition worsened without anyone watching her."
+          ]
+        },
+        {
+          "option_id": "C",
+          "text": "Leave him completely unattended and undocumented.",
+          "quality": "delay",
+          "protocol_alignment": "Fails the documentation and dignity expectations of MCI protocol even when active resuscitation is not appropriate",
+          "vitals_delta": null,
+          "new_status": "EXPECTANT_UNMANAGED",
+          "nurse_response": [
+            "Doctor, the incident log has no record for him -- his family will need an answer later."
+          ]
+        },
+        {
+          "option_id": "D",
+          "text": "Move him to the Minor-injuries area to avoid confronting the situation.",
+          "quality": "critical_error",
+          "protocol_alignment": "Mislabels and mismanages an Expectant patient, creating confusion in the triage area",
+          "vitals_delta": null,
+          "new_status": "EXPECTANT_UNMANAGED",
+          "nurse_response": [
+            "Doctor, that's caused confusion in the minor area -- we need to correct his placement."
+          ]
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 8,
+        "resources_optimal": []
+      }
+    }
+  },
+  "flow_control": {
+    "explanation": "No decision node's option points directly at another patient's decision node -- every node here is a self-contained single decision (or, for TRIAGE_SWEEP, one decision per patient within that sweep). The engine advances between patients/nodes ONLY by following the fixed sequence below, never by an embedded next_decision cross-reference. After each decision, the engine presents the SAME patient's next node if one exists (none do at this level's depth -- see scope_note), otherwise it advances to the next step in this sequence.",
+    "sequence": [
+      {
+        "step": 1,
+        "node": "TRIAGE_SWEEP.P1_TRIAGE",
+        "on_complete": "advance to step 2"
+      },
+      {
+        "step": 2,
+        "node": "TRIAGE_SWEEP.P2_TRIAGE",
+        "on_complete": "advance to step 3"
+      },
+      {
+        "step": 3,
+        "node": "TRIAGE_SWEEP.P3_TRIAGE",
+        "on_complete": "advance to step 4"
+      },
+      {
+        "step": 4,
+        "node": "TRIAGE_SWEEP.P4_TRIAGE",
+        "on_complete": "advance to step 5"
+      },
+      {
+        "step": 5,
+        "node": "TRIAGE_SWEEP.P5_TRIAGE",
+        "on_complete": "advance to step 6"
+      },
+      {
+        "step": 6,
+        "node": "TRIAGE_SWEEP.P6_TRIAGE",
+        "on_complete": "advance to step 7"
+      },
+      {
+        "step": 7,
+        "node": "TREATMENT_ORDER",
+        "on_complete": "the option chosen here sets the order for steps 8-10 among P3_MANAGEMENT, P4_MANAGEMENT and P1_MANAGEMENT; option A's order (P3, P4, P1) is used below by default"
+      },
+      {
+        "step": 8,
+        "patient_id": "P3",
+        "node": "P3_MANAGEMENT",
+        "on_complete": "advance to step 9"
+      },
+      {
+        "step": 9,
+        "patient_id": "P4",
+        "node": "P4_MANAGEMENT",
+        "on_complete": "advance to step 10"
+      },
+      {
+        "step": 10,
+        "patient_id": "P1",
+        "node": "P1_MANAGEMENT",
+        "on_complete": "advance to step 11"
+      },
+      {
+        "step": 11,
+        "patient_id": "P5",
+        "node": "P5_MANAGEMENT",
+        "on_complete": "advance to step 12"
+      },
+      {
+        "step": 12,
+        "patient_id": "P2",
+        "node": "P2_MANAGEMENT",
+        "on_complete": "advance to step 13"
+      },
+      {
+        "step": 13,
+        "patient_id": "P6",
+        "node": "P6_MANAGEMENT",
+        "on_complete": "level complete -> evaluate endings.level_outcome_logic"
+      }
+    ]
+  },
+  "endings": {
+    "level_outcome_logic": "Level 4 result is computed across all 6 patients. SUCCESS requires: (1) correct or acceptable START category chosen for at least 5 of 6 patients, (2) no patient in P1_MANAGEMENT, P3_MANAGEMENT, or P4_MANAGEMENT reaching CRITICAL_ENDPOINT, and (3) P5 and P2 reaching a STABLE_* status. Any Immediate patient reaching CRITICAL_ENDPOINT triggers overall level FAILURE.",
+    "SUCCESS": {
+      "status_code": "SUCCESS",
+      "banner": "MASS CASUALTY EVENT MANAGED"
+    },
+    "SUCCESS_WITH_PENALTY": {
+      "status_code": "SUCCESS_WITH_PENALTY",
+      "banner": "MASS CASUALTY EVENT MANAGED (RESOURCE-INEFFICIENT / TRIAGE ERRORS)"
+    },
+    "FAILURE": {
+      "status_code": "FAILURE",
+      "banner": "MASS CASUALTY EVENT - PREVENTABLE LOSS OF LIFE"
+    }
+  },
+  "performance_report_schema": {
+    "triage_accuracy_per_patient": {
+      "P1": "boolean",
+      "P2": "boolean",
+      "P3": "boolean",
+      "P4": "boolean",
+      "P5": "boolean",
+      "P6": "boolean"
+    },
+    "treatment_order_accuracy": "boolean - whether TREATMENT_ORDER option A was selected",
+    "decision_history": [
+      {
+        "decision_id": "string",
+        "patient_id": "string",
+        "action_text": "string",
+        "quality": "optimal|delay|resource_waste|critical_error",
+        "time_taken_seconds": "number (runtime)",
+        "expected_seconds": "number (authored)"
+      }
+    ],
+    "resource_summary": {
+      "total_units_available": "sum of resource_pool_at_level_start",
+      "total_units_consumed": "runtime",
+      "units_wasted": "runtime"
+    },
+    "score_components": [
+      "triage_accuracy",
+      "treatment_order_accuracy",
+      "decision_quality",
+      "response_time",
+      "resource_efficiency",
+      "protocol_adherence_start_and_cdc"
+    ]
+  }
+}

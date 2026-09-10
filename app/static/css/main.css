@@ -1,0 +1,236 @@
+/* =========================================================================
+   MedSim — visual language ported from the "RAMCO HACK" design.
+   Medium slate-blue grounds, cool panel surfaces, cyan/teal accent reserved
+   for interactive + active states, status colours reserved for patient
+   state / outcome. Every selector below is the SAME one the templates
+   already use — only the look changed, not the markup or the JS.
+   ========================================================================= */
+:root {
+  --ink: #3B5068;          /* page ground */
+  --ink-2: #34485E;
+  --navy: #44596F;         /* secondary surfaces / header */
+  --panel: #4B6179;        /* cards */
+  --panel-2: #566D86;
+  --line: rgba(206, 226, 240, .17);
+  --line-2: rgba(206, 226, 240, .30);
+  --cyan: #7EE8E1;         /* primary accent */
+  --cyan-soft: #AEF2ED;
+  --cyan-deep: #3FC4BD;
+  --cyan-dim: rgba(126, 232, 225, .14);
+  --blue: #9CC7F2;
+  --red: #FF9AA5;
+  --red-line: #FF6B7D;
+  --amber: #FFCB66;
+  --green: #7DE6B9;
+  --text: #F3F7FA;
+  --muted: #D0DCE6;
+  --topbar: rgba(55, 74, 96, .88);
+  --shadow: 0 18px 44px rgba(20, 32, 46, .32);
+
+  /* legacy names still referenced by report.css / templates */
+  --brand-primary: var(--navy);
+  --brand-primary-light: var(--panel);
+  --brand-accent: var(--cyan-deep);
+  --brand-accent-light: var(--cyan-dim);
+  --color-excellent: var(--green);
+  --color-acceptable: var(--cyan-deep);
+  --color-uncertain: var(--amber);
+  --color-critical: var(--red);
+  --border: var(--line);
+  --surface: rgba(75, 97, 121, .92);
+  --surface-alt: rgba(86, 109, 134, .55);
+  --bg: var(--ink);
+  --radius: 14px;
+  --font: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text);
+  background:
+    radial-gradient(1100px 620px at 78% -8%, rgba(126, 232, 225, .13), transparent 60%),
+    radial-gradient(900px 520px at 8% 100%, rgba(156, 199, 242, .13), transparent 62%),
+    linear-gradient(180deg, #41576F 0%, var(--ink) 45%, var(--ink-2) 100%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 { font-family: "Saira", "IBM Plex Sans", sans-serif; font-weight: 600; margin: 0; }
+
+a { color: var(--cyan-soft); text-decoration: none; }
+a:hover { color: var(--cyan); text-decoration: underline; }
+:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; border-radius: 6px; }
+
+.site-header {
+  background: var(--topbar);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.site-header__inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 16px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "Saira", sans-serif;
+  font-weight: 700;
+  letter-spacing: .12em;
+  font-size: 17px;
+  color: var(--text);
+}
+.brand:hover { text-decoration: none; opacity: .9; }
+.brand__mark {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 8px;
+  background: linear-gradient(180deg, #8CEEE7, var(--cyan-deep));
+  color: #0B2E36; font-weight: 800;
+}
+.site-nav { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+.site-nav a {
+  color: var(--muted);
+  margin-left: 6px;
+  padding: 8px 12px;
+  border-radius: 9px;
+  font-size: 0.85rem;
+  font-family: "Saira", sans-serif;
+  letter-spacing: .03em;
+}
+.site-nav a:hover { color: var(--cyan); text-decoration: none; background: var(--cyan-dim); }
+
+.page { max-width: 1180px; margin: 0 auto; padding: 32px 28px 70px; }
+
+.site-footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.82rem;
+  padding: 24px 20px 40px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 13px 22px;
+  border-radius: 11px;
+  font-family: "Saira", sans-serif;
+  font-weight: 600;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  font-size: 12.5px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform .16s ease, box-shadow .2s ease, background .2s ease, border-color .2s;
+}
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: linear-gradient(180deg, #8CEEE7, var(--cyan-deep)); color: #0B2E36; box-shadow: 0 10px 24px rgba(30, 120, 120, .28); }
+.btn-primary:hover { box-shadow: 0 14px 32px rgba(30, 140, 140, .38); text-decoration: none; }
+.btn-outline { border-color: var(--line-2); color: var(--text); background: rgba(255, 255, 255, .06); }
+.btn-outline:hover { border-color: var(--cyan); background: var(--cyan-dim); text-decoration: none; }
+
+@media (max-width: 600px) { .page { padding: 18px 16px 40px; } }
+
+/* ---- forms (login, room create/join) ---------------------------------- */
+.form-card, .auth-card {
+  max-width: 440px;
+  margin: 40px auto;
+  background: linear-gradient(180deg, rgba(86, 109, 134, .94), rgba(73, 95, 119, .94));
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 30px;
+}
+.form-card h1 { font-size: 1.5rem; margin-bottom: 18px; }
+.auth-tabs { display: flex; gap: 4px; margin-bottom: 20px; }
+.auth-tab {
+  flex: 1; text-align: center; padding: 10px; border-radius: 10px;
+  color: var(--muted); font-weight: 600; font-size: 0.85rem;
+  font-family: "Saira", sans-serif; letter-spacing: .05em;
+}
+.auth-tab.active { background: var(--cyan-dim); color: var(--cyan); }
+.auth-tab:hover { text-decoration: none; color: var(--cyan-soft); }
+
+.form { display: flex; flex-direction: column; gap: 14px; }
+.field { display: block; margin-bottom: 0; }
+.field span {
+  display: block; font-family: "Saira", sans-serif; font-size: 10.5px;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-bottom: 7px;
+}
+.field input, .field select {
+  width: 100%; font: inherit; padding: 12px 14px; border-radius: 10px;
+  background: rgba(44, 61, 80, .45); border: 1px solid var(--line-2); color: var(--text);
+}
+.field input:focus, .field select:focus { border-color: var(--cyan); outline: none; }
+.field select option { background: #44596F; color: var(--text); }
+.checkbox { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text); margin-bottom: 6px; }
+fieldset.field { border: none; padding: 0; }
+fieldset.field legend { padding: 0; margin-bottom: 8px; font-family: "Saira", sans-serif; font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+
+.form-alert { padding: 11px 14px; border-radius: 10px; font-size: 0.88rem; }
+.form-alert--error { background: rgba(255, 107, 125, .14); color: var(--red); border: 1px solid rgba(255, 107, 125, .4); }
+.form-alert--success { background: var(--cyan-dim); color: var(--cyan-soft); border: 1px solid var(--line-2); }
+
+/* ---- leaderboard -------------------------------------------------------- */
+.leaderboard-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+.leaderboard-table th {
+  text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line);
+  font-family: "Saira", sans-serif; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted);
+}
+.leaderboard-table td { text-align: left; padding: 12px; border-bottom: 1px solid rgba(206, 226, 240, .1); }
+
+/* ---- game shell ---------------------------------------------------------- */
+.game-shell { display: flex; flex-direction: column; gap: 18px; }
+.patient-hud { display: flex; flex-wrap: wrap; gap: 14px; }
+.patient-hud__card {
+  background: linear-gradient(180deg, rgba(86, 109, 134, .94), rgba(73, 95, 119, .94));
+  border: 1px solid var(--line); border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(20, 32, 46, .18); padding: 16px 18px; min-width: 220px; flex: 1;
+}
+.patient-hud__card--focus { border-color: var(--cyan); box-shadow: 0 0 0 1px rgba(126, 232, 225, .3), 0 16px 36px rgba(30, 120, 120, .18); }
+.patient-hud__card h3 { margin: 0 0 8px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+.patient-hud__stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.patient-hud__stat { min-width: 90px; }
+.patient-hud__stat span { display: block; font-size: 0.75rem; color: var(--muted); }
+.patient-hud__stat strong { font-size: 1.05rem; font-family: "IBM Plex Mono", monospace; }
+
+.scenario-card {
+  background: linear-gradient(180deg, rgba(92, 117, 143, .97), rgba(76, 99, 124, .97));
+  border: 1px solid var(--line-2); border-radius: 20px;
+  box-shadow: var(--shadow); padding: 26px 30px;
+}
+.scenario-card__stage {
+  text-transform: uppercase; font-size: 11px; letter-spacing: .18em;
+  color: var(--cyan); font-weight: 700; font-family: "Saira", sans-serif;
+}
+.scenario-card__text { margin: 12px 0; line-height: 1.6; color: var(--text); }
+.scenario-card__question {
+  font-family: "Saira", sans-serif; font-weight: 500; font-size: 19px;
+  border: 1px solid var(--line-2); border-left: 3px solid var(--cyan); border-radius: 12px;
+  padding: 12px 18px; margin-bottom: 16px; background: rgba(126, 232, 225, .08);
+}
+.scenario-card__options { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+.option-btn {
+  width: 100%; text-align: left; justify-content: flex-start;
+  border: 1px solid var(--line-2); border-radius: 12px; background: rgba(255, 255, 255, .05);
+  padding: 13px 18px; font-size: 15px; text-transform: none; letter-spacing: normal; font-weight: 400;
+}
+.option-btn:hover { border-color: var(--cyan); background: var(--cyan-dim); transform: translateX(3px); }
+
+.nurse-log { display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; color: var(--muted); }
+
+@media (max-width: 700px) { .scenario-card__options { grid-template-columns: 1fr; } }

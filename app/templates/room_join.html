@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}EMERGIQ — Join Assessment{% endblock %}
+
+{% block content %}
+<div class="wrap page" style="max-width:620px">
+  <span class="eyebrow">Join assessment</span>
+  <h1 class="ptt" style="margin:8px 0 22px">Enter your room code</h1>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <p class="err on" role="alert">{{ message }}</p>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <form class="card" method="post" action="{{ url_for('rooms.join_room') }}">
+    <label class="field"><span>Room code</span>
+      <input type="text" name="code" required maxlength="12" autocomplete="off" class="mono"
+             style="font-size:24px;letter-spacing:.24em;text-transform:uppercase;text-align:center" placeholder="e.g. 7QK3XZ">
+    </label>
+    <button class="btn btn-primary" type="submit" style="width:100%">Join</button>
+    <p class="protonote">Your Host shares the room code. You will wait in the room until the Host starts the assessment.</p>
+  </form>
+</div>
+{% endblock %}

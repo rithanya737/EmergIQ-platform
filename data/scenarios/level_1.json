@@ -1,0 +1,963 @@
+{
+  "level_id": 1,
+  "level_name": "First Response",
+  "codename": "EmergIQ - First Response",
+  "difficulty": "Easy",
+  "patient_count": 1,
+  "main_skill": "Recognize -> Assess -> Respond -> Reassess -> Stabilize",
+  "core_question": "What is happening to this patient, and what should I do?",
+  "protocol_reference": {
+    "primary_source": "abcde_sequence.json",
+    "attribution": "Resuscitation Council UK",
+    "usage_note": "All correct-path decisions follow the Airway-Breathing-Circulation-Disability-Exposure assessment order. Options that skip or delay airway/breathing assessment are penalized."
+  },
+  "note": "All names, vitals, and clinical details below are entirely fictional training content generated for simulation purposes.",
+  "intro_sequence": {
+    "phase_1_nurse_intro": {
+      "character": "Nurse Maya",
+      "dialogue": [
+        "Good morning, Doctor. I'm Nurse Maya.",
+        "We have a 24-year-old patient arriving with severe difficulty breathing.",
+        "He's conscious, but visibly distressed."
+      ]
+    }
+  },
+  "patients": [
+    {
+      "patient_id": "P1",
+      "name": "Arun Kumar",
+      "age": 24,
+      "sex": "Male",
+      "chief_complaint": "Acute breathing difficulty",
+      "arrival_mode": "Walk-in, self-presented, visibly distressed",
+      "initial_status": "AT_RISK",
+      "initial_vitals": {
+        "HR_bpm": 118,
+        "SpO2_percent": 91,
+        "RR_per_min": 26,
+        "BP_mmHg": "104/70",
+        "consciousness": "Conscious, alert"
+      },
+      "medical_report": {
+        "patient_id": "RKEMC-2026-00147",
+        "name": "Arun Kumar",
+        "age": 24,
+        "sex": "Male",
+        "blood_group": "B+",
+        "known_allergies": "None reported",
+        "past_medical_history": "Mild intermittent asthma (childhood, no recent inhaler use)",
+        "current_medications": "None",
+        "presenting_complaint": "Sudden onset difficulty breathing, started ~30 minutes prior to arrival, no clear trigger identified",
+        "vitals_on_arrival": {
+          "HR_bpm": 118,
+          "SpO2_percent": 91,
+          "RR_per_min": 26,
+          "BP_mmHg": "104/70",
+          "Temp_C": 37.1,
+          "GCS": "15/15"
+        },
+        "triage_category_esi": "ESI-2 (high-risk, unstable vitals, requires immediate physician assessment)",
+        "time_of_arrival": "08:12",
+        "assigned_team": "Emergency Bay 3 - Dr. (Player), Nurse Maya"
+      }
+    }
+  ],
+  "hud_spec": {
+    "position": "right side, persistent throughout level",
+    "fields": [
+      "name",
+      "age",
+      "chief_complaint",
+      "HR_bpm",
+      "SpO2_percent",
+      "RR_per_min",
+      "BP_mmHg",
+      "consciousness",
+      "status"
+    ],
+    "status_colors": {
+      "STABILIZED": "green",
+      "AT_RISK": "yellow",
+      "DETERIORATING": "orange",
+      "CRITICAL": "red"
+    },
+    "ui_rule": "Whenever a vital changes, display 'old -> new' with a directional arrow (e.g. 91% -> 89% down) rather than silently replacing the value, so the player sees the consequence of their decision."
+  },
+  "decision_tree": {
+    "D1_INITIAL_RESPONSE": {
+      "patient_id": "P1",
+      "applies_to_status": "AT_RISK",
+      "nurse_dialogue": [
+        "Doctor, the patient is struggling to breathe. What would you like me to do first?"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Assess his airway and breathing immediately.",
+          "protocol_alignment": "ABCDE - Airway then Breathing, correct first step",
+          "quality": "optimal",
+          "resource_use": [
+            "stethoscope",
+            "pulse_oximeter"
+          ],
+          "assessment_reveal": {
+            "airway": "Patent",
+            "breathing": "Labored",
+            "SpO2_percent": 91,
+            "RR_per_min": 26
+          },
+          "vitals_delta": {
+            "HR_bpm": "118 -> 118 (no change)",
+            "SpO2_percent": "91 -> 91 (no change)",
+            "RR_per_min": "26 -> 26 (no change)",
+            "BP_mmHg": "104/70 -> 104/70 (no change)"
+          },
+          "new_status": "AT_RISK",
+          "nurse_response": [
+            "Understood, Doctor.",
+            "His airway is patent, Doctor, but his breathing remains labored.",
+            "What would you like to do next?"
+          ],
+          "next_decision": "D2_AT_RISK"
+        },
+        {
+          "option_id": "B",
+          "text": "Wait and observe him for a few minutes.",
+          "protocol_alignment": "Violates ABCDE - no primary survey performed",
+          "quality": "delay",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "118 -> 124 (up)",
+            "SpO2_percent": "91 -> 89 (down)",
+            "RR_per_min": "26 -> 30 (up)",
+            "BP_mmHg": "104/70 -> 102/68 (down)"
+          },
+          "new_status": "DETERIORATING",
+          "nurse_response": [
+            "Doctor, he's becoming more breathless.",
+            "His observations are worsening.",
+            "What would you like to do now?"
+          ],
+          "next_decision": "D2_DETERIORATING"
+        },
+        {
+          "option_id": "C",
+          "text": "Take a detailed history before assessing his current condition.",
+          "protocol_alignment": "Violates ABCDE - history before primary survey in an unstable patient",
+          "quality": "delay",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "118 -> 122 (up)",
+            "SpO2_percent": "91 -> 90 (down)",
+            "RR_per_min": "26 -> 29 (up)",
+            "BP_mmHg": "104/70 -> 104/70 (no change)"
+          },
+          "new_status": "DETERIORATING",
+          "nurse_response": [
+            "Doctor, while we've been taking the history, his breathing has become more labored.",
+            "Would you like to reassess him now?"
+          ],
+          "next_decision": "D2_DETERIORATING"
+        },
+        {
+          "option_id": "D",
+          "text": "Send him for routine investigations before beginning the assessment.",
+          "protocol_alignment": "Severe violation of ABCDE - unstable patient sent away from direct observation",
+          "quality": "critical_error",
+          "resource_use": [
+            "radiology_slot"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "118 -> 128 (up)",
+            "SpO2_percent": "91 -> 87 (down)",
+            "RR_per_min": "26 -> 32 (up)",
+            "BP_mmHg": "104/70 -> 98/62 (down)"
+          },
+          "new_status": "CRITICAL",
+          "nurse_response": [
+            "Doctor, his condition is deteriorating rapidly.",
+            "We need to act now. What is your immediate priority?"
+          ],
+          "next_decision": "D2_CRITICAL"
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 12,
+        "resources_optimal": [
+          "stethoscope",
+          "pulse_oximeter"
+        ]
+      }
+    },
+    "D2_AT_RISK": {
+      "patient_id": "P1",
+      "applies_to_status": "AT_RISK",
+      "nurse_dialogue": [
+        "His airway is patent, but his breathing remains labored.",
+        "What would you like to do next?"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Reassess his respiratory status and oxygenation, and start supplemental oxygen.",
+          "protocol_alignment": "ABCDE - Breathing management before moving on",
+          "quality": "optimal",
+          "resource_use": [
+            "oxygen_mask",
+            "pulse_oximeter"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "118 -> 114 (down)",
+            "SpO2_percent": "91 -> 94 (up)",
+            "RR_per_min": "26 -> 24 (down)",
+            "BP_mmHg": "104/70 -> 106/70 (up)"
+          },
+          "new_status": "AT_RISK_IMPROVING",
+          "nurse_response": [
+            "Good, Doctor. His oxygen levels are responding.",
+            "He's still working hard to breathe, but this is an improvement."
+          ],
+          "next_decision": "D3_RECOVERING"
+        },
+        {
+          "option_id": "B",
+          "text": "Continue routine history-taking without reassessing his breathing.",
+          "protocol_alignment": "Delays reassessment of a labored-breathing patient",
+          "quality": "delay",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "118 -> 123 (up)",
+            "SpO2_percent": "91 -> 88 (down)",
+            "RR_per_min": "26 -> 29 (up)",
+            "BP_mmHg": "104/70 -> 100/66 (down)"
+          },
+          "new_status": "DETERIORATING",
+          "nurse_response": [
+            "Doctor, his breathing hasn't improved -- if anything, it's worse.",
+            "We need to reassess him."
+          ],
+          "next_decision": "D3_DETERIORATING"
+        },
+        {
+          "option_id": "C",
+          "text": "Wait to see whether his breathing improves on its own.",
+          "protocol_alignment": "No intervention on a known hypoxic patient",
+          "quality": "delay",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "118 -> 125 (up)",
+            "SpO2_percent": "91 -> 87 (down)",
+            "RR_per_min": "26 -> 30 (up)",
+            "BP_mmHg": "104/70 -> 99/65 (down)"
+          },
+          "new_status": "DETERIORATING",
+          "nurse_response": [
+            "Doctor, he isn't improving on his own.",
+            "His saturation is dropping."
+          ],
+          "next_decision": "D3_DETERIORATING"
+        },
+        {
+          "option_id": "D",
+          "text": "Send him for non-urgent investigations first.",
+          "protocol_alignment": "Removes an at-risk patient from direct monitoring for a non-urgent step",
+          "quality": "critical_error",
+          "resource_use": [
+            "radiology_slot"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "118 -> 129 (up)",
+            "SpO2_percent": "91 -> 85 (down)",
+            "RR_per_min": "26 -> 33 (up)",
+            "BP_mmHg": "104/70 -> 96/60 (down)"
+          },
+          "new_status": "CRITICAL",
+          "nurse_response": [
+            "Doctor, he's deteriorating rapidly while he was away from the bay.",
+            "We need immediate action."
+          ],
+          "next_decision": "D3_CRITICAL"
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 10,
+        "resources_optimal": [
+          "oxygen_mask",
+          "pulse_oximeter"
+        ]
+      }
+    },
+    "D2_DETERIORATING": {
+      "patient_id": "P1",
+      "applies_to_status": "DETERIORATING",
+      "nurse_dialogue": [
+        "Doctor, his oxygen saturation has fallen and his breathing is worsening.",
+        "What would you like to do now?"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Reassess his current respiratory status immediately and start supplemental oxygen.",
+          "protocol_alignment": "ABCDE - recovers the missed Breathing step",
+          "quality": "optimal",
+          "resource_use": [
+            "oxygen_mask",
+            "pulse_oximeter"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "124 -> 120 (down)",
+            "SpO2_percent": "89 -> 91 (up)",
+            "RR_per_min": "30 -> 28 (down)",
+            "BP_mmHg": "102/68 -> 103/69 (up)"
+          },
+          "new_status": "RECOVERING",
+          "nurse_response": [
+            "Good, Doctor. His deterioration has slowed.",
+            "But he's not stable yet."
+          ],
+          "next_decision": "D3_RECOVERING"
+        },
+        {
+          "option_id": "B",
+          "text": "Continue waiting and observe.",
+          "protocol_alignment": "Repeated delay on a deteriorating patient",
+          "quality": "critical_error",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "124 -> 128 (up)",
+            "SpO2_percent": "89 -> 87 (down)",
+            "RR_per_min": "30 -> 32 (up)",
+            "BP_mmHg": "102/68 -> 98/62 (down)"
+          },
+          "new_status": "CRITICAL",
+          "nurse_response": [
+            "Doctor, his condition is worsening.",
+            "We need to reassess and act immediately."
+          ],
+          "next_decision": "D3_CRITICAL"
+        },
+        {
+          "option_id": "C",
+          "text": "Continue routine history-taking.",
+          "protocol_alignment": "Repeated delay on a deteriorating patient",
+          "quality": "critical_error",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "124 -> 129 (up)",
+            "SpO2_percent": "89 -> 86 (down)",
+            "RR_per_min": "30 -> 33 (up)",
+            "BP_mmHg": "102/68 -> 96/60 (down)"
+          },
+          "new_status": "CRITICAL",
+          "nurse_response": [
+            "Doctor, he's getting worse while we talk.",
+            "We need to act now."
+          ],
+          "next_decision": "D3_CRITICAL"
+        },
+        {
+          "option_id": "D",
+          "text": "Wait for investigation results before reassessing.",
+          "protocol_alignment": "Severe delay, no bedside reassessment of unstable patient",
+          "quality": "critical_error",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "124 -> 131 (up)",
+            "SpO2_percent": "89 -> 84 (down)",
+            "RR_per_min": "30 -> 34 (up)",
+            "BP_mmHg": "102/68 -> 94/58 (down)"
+          },
+          "new_status": "CRITICAL",
+          "nurse_response": [
+            "Doctor, we can't wait any longer -- he's crashing."
+          ],
+          "next_decision": "D3_CRITICAL"
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 8,
+        "resources_optimal": [
+          "oxygen_mask",
+          "pulse_oximeter"
+        ]
+      }
+    },
+    "D2_CRITICAL": {
+      "patient_id": "P1",
+      "applies_to_status": "CRITICAL",
+      "nurse_dialogue": [
+        "Doctor, he's deteriorating rapidly.",
+        "We need immediate action. What is your priority?"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Immediately reassess airway and breathing, apply high-flow oxygen, and prepare for escalation.",
+          "protocol_alignment": "ABCDE - emergency recovery of the primary survey",
+          "quality": "optimal",
+          "resource_use": [
+            "oxygen_mask",
+            "pulse_oximeter",
+            "escalation_call"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "128 -> 122 (down)",
+            "SpO2_percent": "87 -> 90 (up)",
+            "RR_per_min": "32 -> 29 (down)",
+            "BP_mmHg": "98/62 -> 101/66 (up)"
+          },
+          "new_status": "RECOVERING",
+          "nurse_response": [
+            "Good call, Doctor. He's responding.",
+            "Still critical, but we've bought time."
+          ],
+          "next_decision": "D3_RECOVERING"
+        },
+        {
+          "option_id": "B",
+          "text": "Order further routine investigations.",
+          "protocol_alignment": "Fails to act on a critical patient",
+          "quality": "critical_error",
+          "resource_use": [
+            "radiology_slot"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "128 -> 134 (up)",
+            "SpO2_percent": "87 -> 83 (down)",
+            "RR_per_min": "32 -> 35 (up)",
+            "BP_mmHg": "98/62 -> 90/56 (down)"
+          },
+          "new_status": "PERI_ARREST",
+          "nurse_response": [
+            "Doctor, we're losing him -- we need to act now!"
+          ],
+          "next_decision": "D3_CRITICAL"
+        },
+        {
+          "option_id": "C",
+          "text": "Step out to consult a senior colleague before doing anything.",
+          "protocol_alignment": "Delays immediate life-saving intervention",
+          "quality": "critical_error",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "128 -> 133 (up)",
+            "SpO2_percent": "87 -> 84 (down)",
+            "RR_per_min": "32 -> 34 (up)",
+            "BP_mmHg": "98/62 -> 92/58 (down)"
+          },
+          "new_status": "PERI_ARREST",
+          "nurse_response": [
+            "Doctor, please -- he needs you here now."
+          ],
+          "next_decision": "D3_CRITICAL"
+        },
+        {
+          "option_id": "D",
+          "text": "Continue observing without intervening.",
+          "protocol_alignment": "No action on a critical patient",
+          "quality": "critical_error",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "128 -> 136 (up)",
+            "SpO2_percent": "87 -> 82 (down)",
+            "RR_per_min": "32 -> 36 (up)",
+            "BP_mmHg": "98/62 -> 88/54 (down)"
+          },
+          "new_status": "PERI_ARREST",
+          "nurse_response": [
+            "Doctor, he's about to arrest -- we have to intervene!"
+          ],
+          "next_decision": "D3_CRITICAL"
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 6,
+        "resources_optimal": [
+          "oxygen_mask",
+          "pulse_oximeter",
+          "escalation_call"
+        ]
+      }
+    },
+    "D3_RECOVERING": {
+      "patient_id": "P1",
+      "applies_to_status": "RECOVERING",
+      "nurse_dialogue": [
+        "Doctor, his observations are worsening.",
+        "What do you want to do now?"
+      ],
+      "note": "Shown when patient reaches D3 in a recovering-but-unstable state; nurse framing adapts to trend, engine selects the improving variant below when the immediately preceding delta was positive.",
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Reassess the patient immediately and address the current respiratory problem (titrate oxygen, recheck ABG-equivalent status).",
+          "protocol_alignment": "ABCDE - ongoing reassessment loop",
+          "quality": "optimal",
+          "resource_use": [
+            "pulse_oximeter"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "120 -> 120 (down from pre-D2 peak)",
+            "SpO2_percent": "90 -> 90 (up)",
+            "RR_per_min": "29 -> 29 (down)",
+            "BP_mmHg": "100/65 -> 100/65 (up)"
+          },
+          "new_status": "UNSTABLE_RECOVERING",
+          "nurse_response": [
+            "Good, Doctor. We're seeing signs of recovery.",
+            "He is still unstable, so we need to continue monitoring."
+          ],
+          "next_decision": "D4_FINAL_MANAGEMENT"
+        },
+        {
+          "option_id": "B",
+          "text": "Continue taking the routine history.",
+          "protocol_alignment": "Delay during an unstable recovery phase",
+          "quality": "delay",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "up",
+            "SpO2_percent": "down",
+            "RR_per_min": "up",
+            "BP_mmHg": "down"
+          },
+          "new_status": "DETERIORATING",
+          "nurse_response": [
+            "Doctor, he's getting worse."
+          ],
+          "next_decision": "D4_FINAL_MANAGEMENT"
+        },
+        {
+          "option_id": "C",
+          "text": "Wait and see whether his condition improves.",
+          "protocol_alignment": "No active reassessment",
+          "quality": "delay",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "up",
+            "SpO2_percent": "down",
+            "RR_per_min": "up",
+            "BP_mmHg": "down"
+          },
+          "new_status": "DETERIORATING",
+          "nurse_response": [
+            "Doctor, he's getting worse."
+          ],
+          "next_decision": "D4_FINAL_MANAGEMENT"
+        },
+        {
+          "option_id": "D",
+          "text": "Continue with non-urgent investigations before reassessing him.",
+          "protocol_alignment": "Removes patient from monitoring during a fragile recovery",
+          "quality": "critical_error",
+          "resource_use": [
+            "radiology_slot"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "up",
+            "SpO2_percent": "down",
+            "RR_per_min": "up",
+            "BP_mmHg": "down"
+          },
+          "new_status": "CRITICAL",
+          "nurse_response": [
+            "Doctor, he's getting worse."
+          ],
+          "next_decision": "D4_FINAL_MANAGEMENT"
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 10,
+        "resources_optimal": [
+          "pulse_oximeter"
+        ]
+      }
+    },
+    "D3_DETERIORATING": {
+      "patient_id": "P1",
+      "applies_to_status": "DETERIORATING",
+      "nurse_dialogue": [
+        "Doctor, his observations are worsening.",
+        "What do you want to do now?"
+      ],
+      "vitals_context": {
+        "HR_bpm": 128,
+        "SpO2_percent": 88,
+        "RR_per_min": 31,
+        "BP_mmHg": "98/62"
+      },
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Reassess the patient immediately and address the current respiratory problem.",
+          "protocol_alignment": "ABCDE - reassessment loop, still recoverable",
+          "quality": "optimal",
+          "resource_use": [
+            "oxygen_mask",
+            "pulse_oximeter"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "128 -> 120 (down)",
+            "SpO2_percent": "88 -> 90 (up)",
+            "RR_per_min": "31 -> 29 (down)",
+            "BP_mmHg": "98/62 -> 100/65 (up)"
+          },
+          "new_status": "UNSTABLE_RECOVERING",
+          "nurse_response": [
+            "Good, Doctor. We're seeing signs of recovery.",
+            "He is still unstable, so we need to continue monitoring."
+          ],
+          "next_decision": "D4_FINAL_MANAGEMENT"
+        },
+        {
+          "option_id": "B",
+          "text": "Continue taking the routine history.",
+          "protocol_alignment": "Delay",
+          "quality": "critical_error",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "128 -> 133 (up)",
+            "SpO2_percent": "88 -> 84 (down)",
+            "RR_per_min": "31 -> 34 (up)",
+            "BP_mmHg": "98/62 -> 92/58 (down)"
+          },
+          "new_status": "CRITICAL",
+          "nurse_response": [
+            "Doctor, he's getting worse."
+          ],
+          "next_decision": "D4_FINAL_MANAGEMENT"
+        },
+        {
+          "option_id": "C",
+          "text": "Wait and see whether his condition improves.",
+          "protocol_alignment": "No intervention",
+          "quality": "critical_error",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "128 -> 134 (up)",
+            "SpO2_percent": "88 -> 83 (down)",
+            "RR_per_min": "31 -> 35 (up)",
+            "BP_mmHg": "98/62 -> 90/56 (down)"
+          },
+          "new_status": "CRITICAL",
+          "nurse_response": [
+            "Doctor, he's getting worse."
+          ],
+          "next_decision": "D4_FINAL_MANAGEMENT"
+        },
+        {
+          "option_id": "D",
+          "text": "Continue with non-urgent investigations before reassessing him.",
+          "protocol_alignment": "Severe delay",
+          "quality": "critical_error",
+          "resource_use": [
+            "radiology_slot"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "128 -> 137 (up)",
+            "SpO2_percent": "88 -> 81 (down)",
+            "RR_per_min": "31 -> 37 (up)",
+            "BP_mmHg": "98/62 -> 86/52 (down)"
+          },
+          "new_status": "PERI_ARREST",
+          "nurse_response": [
+            "Doctor, he's crashing -- we need to act now!"
+          ],
+          "next_decision": "D4_FINAL_MANAGEMENT"
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 8,
+        "resources_optimal": [
+          "oxygen_mask",
+          "pulse_oximeter"
+        ]
+      }
+    },
+    "D3_CRITICAL": {
+      "patient_id": "P1",
+      "applies_to_status": "CRITICAL",
+      "nurse_dialogue": [
+        "Doctor, his observations are worsening further.",
+        "This may be our last chance to turn this around."
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Immediately escalate: high-flow oxygen, call for senior back-up, prepare airway trolley.",
+          "protocol_alignment": "ABCDE - emergency escalation",
+          "quality": "optimal",
+          "resource_use": [
+            "oxygen_mask",
+            "escalation_call",
+            "airway_trolley"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "down",
+            "SpO2_percent": "up",
+            "RR_per_min": "down",
+            "BP_mmHg": "up"
+          },
+          "new_status": "UNSTABLE_RECOVERING",
+          "nurse_response": [
+            "He's responding, Doctor. Still unstable, but we have a chance."
+          ],
+          "next_decision": "D4_FINAL_MANAGEMENT"
+        },
+        {
+          "option_id": "B",
+          "text": "Continue current management without escalating.",
+          "protocol_alignment": "Insufficient response to a critical trend",
+          "quality": "critical_error",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "up",
+            "SpO2_percent": "down",
+            "RR_per_min": "up",
+            "BP_mmHg": "down"
+          },
+          "new_status": "PERI_ARREST",
+          "nurse_response": [
+            "Doctor, we're losing him."
+          ],
+          "next_decision": "D4_FINAL_MANAGEMENT"
+        },
+        {
+          "option_id": "C",
+          "text": "Wait for the next scheduled observation round.",
+          "protocol_alignment": "No action on a critical patient",
+          "quality": "critical_error",
+          "resource_use": [],
+          "vitals_delta": {
+            "HR_bpm": "up",
+            "SpO2_percent": "down",
+            "RR_per_min": "up",
+            "BP_mmHg": "down"
+          },
+          "new_status": "PERI_ARREST",
+          "nurse_response": [
+            "Doctor, there's no time to wait."
+          ],
+          "next_decision": "D4_FINAL_MANAGEMENT"
+        },
+        {
+          "option_id": "D",
+          "text": "Transfer him for imaging before intervening.",
+          "protocol_alignment": "Removes a critical patient from resuscitation area",
+          "quality": "critical_error",
+          "resource_use": [
+            "radiology_slot"
+          ],
+          "vitals_delta": {
+            "HR_bpm": "up",
+            "SpO2_percent": "down",
+            "RR_per_min": "up",
+            "BP_mmHg": "down"
+          },
+          "new_status": "ARREST",
+          "nurse_response": [
+            "Doctor -- he's arrested."
+          ],
+          "next_decision": "D4_FINAL_MANAGEMENT"
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 6,
+        "resources_optimal": [
+          "oxygen_mask",
+          "escalation_call",
+          "airway_trolley"
+        ]
+      }
+    },
+    "D4_FINAL_MANAGEMENT": {
+      "patient_id": "P1",
+      "applies_to_status": [
+        "UNSTABLE_RECOVERING",
+        "DETERIORATING",
+        "CRITICAL",
+        "PERI_ARREST",
+        "ARREST"
+      ],
+      "recoverability_rule": {
+        "explanation": "Resolves outcome_if_prior_state_recoverable vs outcome_if_prior_state_unrecoverable. Only ARREST (full cardiac arrest already reached before this decision) is unrecoverable -- even the optimal option D4:A cannot guarantee stabilization from ARREST within this simulation. Every other prior status (UNSTABLE_RECOVERING, DETERIORATING, CRITICAL, PERI_ARREST) is recoverable: choosing the optimal D4 option resolves it to STABILIZED regardless of how bad the trend was before this final decision. In other words, a patient's fate is decided by the quality of the LAST decision made, not by how many earlier mistakes preceded it -- a player who erred early but corrects course at D4 still saves the patient (see example_player_trajectories.player_B_mistake_then_recovers).",
+        "unrecoverable_prior_states": [
+          "ARREST"
+        ],
+        "recoverable_prior_states": [
+          "UNSTABLE_RECOVERING",
+          "DETERIORATING",
+          "CRITICAL",
+          "PERI_ARREST"
+        ]
+      },
+      "nurse_dialogue_by_state": {
+        "UNSTABLE_RECOVERING": [
+          "Doctor, his condition is improving, but he remains unstable.",
+          "What would you like to do next?"
+        ],
+        "DETERIORATING": [
+          "Doctor, he still hasn't turned the corner.",
+          "What is your final call?"
+        ],
+        "CRITICAL": [
+          "Doctor, he's still critical.",
+          "This is our last opportunity to stabilize him."
+        ],
+        "PERI_ARREST": [
+          "Doctor, he's peri-arrest -- we need definitive action now."
+        ],
+        "ARREST": [
+          "Doctor, he has arrested. We need to begin resuscitation immediately."
+        ]
+      },
+      "options": [
+        {
+          "option_id": "A",
+          "text": "Continue supportive oxygen therapy, closely monitor trend, and prepare for ICU/HDU transfer once stable.",
+          "protocol_alignment": "ABCDE - complete reassessment cycle with safe disposition",
+          "quality": "optimal",
+          "resource_use": [
+            "oxygen_mask",
+            "pulse_oximeter",
+            "monitor"
+          ],
+          "outcome_if_prior_state_recoverable": "STABILIZED",
+          "outcome_if_prior_state_unrecoverable": "CRITICAL_ENDPOINT",
+          "nurse_response_success": [
+            "Doctor, his observations are improving.",
+            "He's stabilized."
+          ],
+          "nurse_response_failure": [
+            "Doctor, despite our interventions, we were unable to stabilize the patient."
+          ]
+        },
+        {
+          "option_id": "B",
+          "text": "Discharge him with advice to rest at home.",
+          "protocol_alignment": "Inappropriate disposition for a patient who required active management",
+          "quality": "critical_error",
+          "resource_use": [],
+          "outcome_if_prior_state_recoverable": "CRITICAL_ENDPOINT",
+          "outcome_if_prior_state_unrecoverable": "CRITICAL_ENDPOINT",
+          "nurse_response_failure": [
+            "Doctor, he collapsed shortly after -- he should never have been discharged."
+          ]
+        },
+        {
+          "option_id": "C",
+          "text": "Leave him under general observation without a management plan.",
+          "protocol_alignment": "No active management or reassessment plan",
+          "quality": "delay",
+          "resource_use": [],
+          "outcome_if_prior_state_recoverable": "PARTIAL_STABILIZATION",
+          "outcome_if_prior_state_unrecoverable": "CRITICAL_ENDPOINT",
+          "nurse_response_partial": [
+            "He's holding steady for now, Doctor, but this isn't a real management plan."
+          ],
+          "nurse_response_failure": [
+            "Doctor, despite our interventions, we were unable to stabilize the patient."
+          ]
+        },
+        {
+          "option_id": "D",
+          "text": "Move on to the next patient without completing reassessment.",
+          "protocol_alignment": "Abandons the reassess-and-stabilize step",
+          "quality": "critical_error",
+          "resource_use": [],
+          "outcome_if_prior_state_recoverable": "CRITICAL_ENDPOINT",
+          "outcome_if_prior_state_unrecoverable": "CRITICAL_ENDPOINT",
+          "nurse_response_failure": [
+            "Doctor, despite our interventions, we were unable to stabilize the patient."
+          ]
+        }
+      ],
+      "evaluator": {
+        "expected_seconds": 10,
+        "resources_optimal": [
+          "oxygen_mask",
+          "pulse_oximeter",
+          "monitor"
+        ]
+      }
+    }
+  },
+  "flow_control": {
+    "explanation": "Single-patient level. Every option's next_decision points only to another node for the same patient (P1), never elsewhere. The engine moves forward strictly by following the next_decision chosen by the player's selected option -- D1_INITIAL_RESPONSE -> D2_* (state-dependent) -> D3_* (state-dependent) -> D4_FINAL_MANAGEMENT -> ending. There is no next patient in this level.",
+    "sequence": [
+      {
+        "step": 1,
+        "node": "D1_INITIAL_RESPONSE",
+        "patient_id": "P1",
+        "on_complete": "level complete once D4_FINAL_MANAGEMENT resolves to an ending in endings{}"
+      }
+    ]
+  },
+  "endings": {
+    "STABILIZED": {
+      "status_code": "SUCCESS",
+      "banner": "MISSION COMPLETE - PATIENT STABILIZED",
+      "nurse_dialogue": [
+        "Doctor, his observations are improving.",
+        "He's stabilized."
+      ]
+    },
+    "PARTIAL_STABILIZATION": {
+      "status_code": "SUCCESS_WITH_PENALTY",
+      "banner": "MISSION COMPLETE - PATIENT STABILIZED (SUBOPTIMAL MANAGEMENT)",
+      "nurse_dialogue": [
+        "He pulled through, Doctor, but a clearer management plan would have gotten him here sooner."
+      ]
+    },
+    "CRITICAL_ENDPOINT": {
+      "status_code": "FAILURE",
+      "banner": "UNSUCCESSFUL OUTCOME",
+      "nurse_dialogue": [
+        "Doctor, despite our interventions, we were unable to stabilize the patient."
+      ],
+      "screen_text": "The patient could not be stabilized within this simulation."
+    }
+  },
+  "example_player_trajectories": {
+    "player_A_excellent": [
+      "D1:A",
+      "D2:A",
+      "D3:A",
+      "D4:A"
+    ],
+    "player_B_mistake_then_recovers": [
+      "D1:B",
+      "D2:A(from DETERIORATING)",
+      "D3:A",
+      "D4:A"
+    ],
+    "player_C_repeated_errors": [
+      "D1:B",
+      "D2:B(from DETERIORATING)",
+      "D3:B",
+      "D4:B"
+    ]
+  },
+  "performance_report_schema": {
+    "decision_history": [
+      {
+        "decision_id": "string",
+        "action_text": "string",
+        "quality": "optimal|delay|critical_error",
+        "patient_status_before": "string",
+        "patient_status_after": "string",
+        "time_taken_seconds": "number (runtime)",
+        "expected_seconds": "number (authored)",
+        "resources_used": "array (runtime)",
+        "resources_optimal": "array (authored)"
+      }
+    ],
+    "final_outcome": "STABILIZED | PARTIAL_STABILIZATION | CRITICAL_ENDPOINT",
+    "score_components": [
+      "decision_quality",
+      "response_time",
+      "resource_efficiency",
+      "protocol_adherence_abcde"
+    ]
+  }
+}

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}EMERGIQ — Level {{ report.level }} Report{% endblock %}
+
+{% block content %}
+<div class="wrap page">
+  <div style="display:flex;justify-content:{{ 'space-between' if attempt.room_id else 'flex-end' }};align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+    {% if attempt.room_id %}
+      <a class="btn btn-ghost" href="{{ url_for('rooms.room_detail', code=attempt.room.code) }}">&larr; Back to {{ attempt.room.name }}</a>
+    {% endif %}
+    <a class="btn btn-primary" href="{{ url_for('dashboard.download_attempt_report_pdf', attempt_id=attempt_id) }}">Download Report</a>
+  </div>
+
+  <span class="eyebrow">Level {{ report.level }} performance report</span>
+  <h1 class="ptt" style="margin-top:8px">{{ report.learner_name }}</h1>
+  <p class="muted" style="margin-top:6px">
+    {% if report.scenario_title %}{{ report.scenario_title }} &middot; {% endif %}
+    {% if report.room %}Room: {{ report.room.name }} ({{ report.room.code }}) &middot; {% endif %}
+    {{ report.total_decisions }} decisions evaluated
+  </p>
+
+  <div class="card" style="margin-top:24px">
+    <span class="eyebrow q">Outcome</span>
+    <div style="margin-top:12px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+      <span class="donut" style="width:auto;height:auto"><b style="position:static;font-size:44px">{{ report.outcome.average_total }}</b></span>
+      <span class="pill {{ 'ok' if 'Excellent' in report.outcome.outcome_label or 'Acceptable' in report.outcome.outcome_label else ('crit' if 'Deteriorated' in report.outcome.outcome_label else 'warn') }}">{{ report.outcome.outcome_label }}</span>
+      {% if attempt and attempt.status == 'time_expired' %}<span class="pill crit">Time expired</span>{% endif %}
+    </div>
+    <div style="margin-top:16px">
+      <div style="margin-bottom:12px"><div class="stat" style="border:none;padding-bottom:4px"><span class="k">Clinical accuracy</span><span class="v">{{ report.outcome.clinical_accuracy }}</span></div><div class="bar"><i style="width:{{ report.outcome.clinical_accuracy }}%"></i></div></div>
+      <div style="margin-bottom:12px"><div class="stat" style="border:none;padding-bottom:4px"><span class="k">Response time</span><span class="v">{{ report.outcome.response_time }}</span></div><div class="bar"><i style="width:{{ report.outcome.response_time }}%"></i></div></div>
+      <div style="margin-bottom:12px"><div class="stat" style="border:none;padding-bottom:4px"><span class="k">Response efficiency</span><span class="v">{{ report.outcome.response_efficiency }}</span></div><div class="bar"><i style="width:{{ report.outcome.response_efficiency }}%"></i></div></div>
+      <div><div class="stat" style="border:none;padding-bottom:4px"><span class="k">Ethical reasoning</span><span class="v">{{ report.outcome.ethical_reasoning }}</span></div><div class="bar"><i style="width:{{ report.outcome.ethical_reasoning }}%"></i></div></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:18px">
+    <span class="eyebrow q">Decision-by-decision breakdown</span>
+    <div class="tablewrap" style="margin-top:12px">
+      <table>
+        <thead>
+          <tr><th>#</th><th>Verdict</th><th>Accuracy</th><th>Speed</th><th>Efficiency</th><th>Ethics</th><th>Total</th><th>Reasoning</th></tr>
+        </thead>
+        <tbody>
+          {% for d in report.details %}
+            <tr>
+              <td class="mono">{{ loop.index }}</td>
+              <td>
+                {% set verdict = d.judgment.clinical_verdict|default('acceptable', true) %}
+                <span class="pill {{ 'ok' if verdict == 'correct' else ('crit' if verdict == 'harmful' else 'warn') }}">{{ verdict }}</span>
+              </td>
+              <td class="mono">{{ d.scorecard.clinical_accuracy }}</td>
+              <td class="mono">{{ d.scorecard.response_time }}</td>
+              <td class="mono">{{ d.scorecard.response_efficiency }}</td>
+              <td class="mono">{{ d.scorecard.ethical_reasoning }}</td>
+              <td class="mono">{{ d.scorecard.decision_total }}</td>
+              <td style="max-width:280px">{{ d.judgment.reasoning }}</td>
+            </tr>
+          {% else %}
+            <tr><td colspan="8" class="empty-state">No decisions recorded for this attempt.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% set missed = [] %}
+  {% for d in report.details %}
+    {% for p in d.judgment.missed_protocol_points %}
+      {% if p not in missed %}{% set _ = missed.append(p) %}{% endif %}
+    {% endfor %}
+  {% endfor %}
+  {% if missed %}
+    <div class="card" style="margin-top:18px">
+      <span class="eyebrow q">Protocol points to review</span>
+      <ul class="muted" style="font-size:14px;line-height:2;padding-left:18px;margin:12px 0 0">
+        {% for point in missed %}<li>{{ point }}</li>{% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
