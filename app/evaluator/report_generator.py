@@ -1,22 +1,4 @@
-"""
-Builds all 3 performance-report surfaces and exports each as a downloadable
-PDF using reportlab:
-
-  1. Attempt (per-level) report   — build_attempt_report()   / export_attempt_report_pdf()
-     Shown right after a learner finishes one level, with a download button.
-
-  2. Dashboard report              — build_dashboard_report() / export_dashboard_report_pdf()
-     A learner's overall performance across EVERY attempt stored for them
-     (solo play + every room they've played in), shown on their dashboard.
-
-  3. Assessment (room) report      — build_room_report()      / export_room_report_pdf()
-     One report per learner covering every level they played inside ONE
-     room, shown once the room/assessment ends — regardless of how many
-     of the room's levels they completed.
-
-All three share the same underlying metrics (app/evaluator/metrics.py) so a
-score means the same thing everywhere a report shows it.
-"""
+# Builds and exports the three performance-report PDFs (attempt, dashboard, room assessment)
 from datetime import datetime
 
 from reportlab.lib.pagesizes import letter
@@ -33,20 +15,19 @@ from reportlab.platypus import (
 
 from app.evaluator.metrics import patient_outcome_score, aggregate_outcomes
 
-# ---------------------------------------------------------------------------
-# Shared PDF look & feel
-# ---------------------------------------------------------------------------
-BRAND_PRIMARY = colors.HexColor("#2b3a55")     # header bars / titles — swap for team brand color
-BRAND_ACCENT = colors.HexColor("#1f8a70")      # good-outcome accent — swap for team brand color
+BRAND_PRIMARY = colors.HexColor("#2b3a55")
+BRAND_ACCENT = colors.HexColor("#1f8a70")
 ROW_ALT = colors.HexColor("#f0f2f6")
 
 
+# Shared paragraph styles for all report PDFs
 def _styles():
     styles = getSampleStyleSheet()
     small = ParagraphStyle("small", parent=styles["Normal"], fontSize=8, leading=10)
     return styles, small
 
 
+# Shared 5-metric summary table used by every report type
 def _summary_table(o: dict) -> Table:
     data = [
         ["Metric", "Average Score (0-100)"],
@@ -68,19 +49,11 @@ def _summary_table(o: dict) -> Table:
     return table
 
 
-# ===========================================================================
-# 1. ATTEMPT (PER-LEVEL) REPORT
-# ===========================================================================
+# Assembles the per-level attempt report dict from evaluated decisions
 def build_report(learner_name: str, level: int, evaluated_decisions: list[dict],
                   room: dict | None = None, scenario_title: str | None = None) -> dict:
-    """
-    evaluated_decisions: list of {"judgment": {...}, "scorecard": {...}} dicts,
-    one per decision point, as returned by the /evaluate/decision endpoint
-    (or DecisionScore.as_evaluated_decision() when reloading from the DB).
-    room: optional {"name": ..., "code": ...} if this attempt was played inside a room.
-    """
     scorecards = [d["scorecard"] for d in evaluated_decisions]
-    outcome = patient_outcome_score(scorecards)  # metric #5: aggregate for this attempt
+    outcome = patient_outcome_score(scorecards)
 
     return {
         "report_type": "attempt",
@@ -90,13 +63,13 @@ def build_report(learner_name: str, level: int, evaluated_decisions: list[dict],
         "room": room,
         "generated_at": datetime.utcnow().isoformat() + "Z",
         "total_decisions": len(evaluated_decisions),
-        "outcome": outcome,  # averages for metrics 1-4 + average_total + outcome_label
+        "outcome": outcome,
         "details": evaluated_decisions,
     }
 
 
+# Builds the attempt report directly from a persisted Attempt row
 def build_attempt_report(attempt) -> dict:
-    """Build report #1 straight from a persisted app.game.models.Attempt row."""
     evaluated_decisions = [d.as_evaluated_decision() for d in attempt.decisions]
     room = {"name": attempt.room.name, "code": attempt.room.code} if attempt.room_id else None
     return build_report(
@@ -108,8 +81,8 @@ def build_attempt_report(attempt) -> dict:
     )
 
 
+# Lightweight HTML preview of an attempt report (stopgap for a Jinja template)
 def render_report_html(report: dict) -> str:
-    """Quick HTML preview without Jinja — prefer templates/report.html + render_template() in the real app."""
     o = report["outcome"]
     rows = "".join(
         f"<tr><td>{i + 1}</td><td>{d['judgment'].get('clinical_verdict')}</td>"
@@ -130,11 +103,8 @@ def render_report_html(report: dict) -> str:
     """
 
 
+# Renders an attempt report to PDF via ReportLab
 def export_attempt_report_pdf(report: dict, output_path: str) -> str:
-    """
-    Render `report` (from build_report / build_attempt_report) to a PDF.
-    Wire to GET /dashboard/report/<attempt_id>/pdf.
-    """
     doc = SimpleDocTemplate(output_path, pagesize=letter, topMargin=0.7 * inch, bottomMargin=0.7 * inch)
     styles, small_style = _styles()
     o = report["outcome"]
@@ -198,22 +168,11 @@ def export_attempt_report_pdf(report: dict, output_path: str) -> str:
     return output_path
 
 
-# Back-compat alias (older code/tests may import this name)
 export_report_pdf = export_attempt_report_pdf
 
 
-# ===========================================================================
-# 2. DASHBOARD REPORT — a learner's overall performance across ALL attempts
-# ===========================================================================
+# Builds a learner's aggregate performance report across all their attempts
 def build_dashboard_report(user, attempts: list | None = None) -> dict:
-    """
-    user: app.auth.models.User
-    attempts: optional pre-fetched list of completed app.game.models.Attempt
-              rows for this user (pass this if the caller already queried
-              them — e.g. ordered/filtered a particular way). Defaults to
-              every completed attempt this user has, across solo play and
-              every room.
-    """
     if attempts is None:
         attempts = _completed_attempts_for_user(user)
 
@@ -273,11 +232,13 @@ def build_dashboard_report(user, attempts: list | None = None) -> dict:
     }
 
 
+# Fetches every completed attempt for a user, across solo play and rooms
 def _completed_attempts_for_user(user) -> list:
     from app.game.models import Attempt
     return Attempt.query.filter_by(user_id=user.id).filter(Attempt.completed_at.isnot(None)).all()
 
 
+# Renders the dashboard report to PDF via ReportLab
 def export_dashboard_report_pdf(report: dict, output_path: str) -> str:
     doc = SimpleDocTemplate(output_path, pagesize=letter, topMargin=0.7 * inch, bottomMargin=0.7 * inch)
     styles, small_style = _styles()
@@ -343,17 +304,8 @@ def export_dashboard_report_pdf(report: dict, output_path: str) -> str:
     return output_path
 
 
-# ===========================================================================
-# 3. ASSESSMENT (ROOM) REPORT — one learner's performance across every level
-#    they played inside ONE room, shown once the assessment ends.
-# ===========================================================================
+# Builds one learner's performance report scoped to a single assessment room
 def build_room_report(room, user, attempts: list | None = None) -> dict:
-    """
-    room: app.rooms.models.Room
-    user: app.auth.models.User (the learner whose report this is)
-    attempts: optional pre-fetched list of this user's completed attempts in
-              this room; defaults to querying them.
-    """
     if attempts is None:
         from app.game.models import Attempt
         attempts = (
@@ -399,6 +351,7 @@ def build_room_report(room, user, attempts: list | None = None) -> dict:
     }
 
 
+# Renders the room assessment report to PDF via ReportLab
 def export_room_report_pdf(report: dict, output_path: str) -> str:
     doc = SimpleDocTemplate(output_path, pagesize=letter, topMargin=0.7 * inch, bottomMargin=0.7 * inch)
     styles, small_style = _styles()
@@ -453,17 +406,8 @@ def export_room_report_pdf(report: dict, output_path: str) -> str:
     return output_path
 
 
-# ===========================================================================
-# Persistence helper — call once when an attempt finishes (game/engine.py)
-# ===========================================================================
+# Persists a finished attempt's decision scores and denormalized averages
 def save_attempt_outcome(attempt, evaluated_decisions: list[dict]) -> dict:
-    """
-    Persist the per-decision rows (DecisionScore) and the denormalized
-    per-attempt averages onto `attempt` (app.game.models.Attempt), so the
-    dashboard/room reports can aggregate without recomputing from scratch.
-    Call this once, right when a level ends, then commit the session.
-    Returns the outcome dict (same shape patient_outcome_score() returns).
-    """
     from app.extensions import db
     from app.game.models import DecisionScore
 
@@ -505,14 +449,8 @@ def save_attempt_outcome(attempt, evaluated_decisions: list[dict]) -> dict:
     return outcome
 
 
-# ===========================================================================
-# ACHIEVEMENTS — computed on the fly from Attempt/Room rows (no separate
-# table), mirroring RAMCO's achievements() function.
-# ===========================================================================
+# Computes a learner's unlocked achievement badges from their attempt history
 def build_achievements(user) -> list:
-    """Returns a list of {"label", "tone", "detail"} dicts for the badges
-    this learner has unlocked. Recomputed on every dashboard load — cheap
-    at this data size and always in sync with the underlying attempts."""
     from app.game.models import Attempt
     from app.rooms.models import Room
     from app.game.level_manager import LevelManager

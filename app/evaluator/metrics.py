@@ -1,24 +1,5 @@
-"""
-The 5 performance-evaluation metrics for a decision/attempt.
+# Computes the 5 per-decision/attempt performance metrics and their weighted aggregate
 
-    1. Clinical accuracy   - was the decision medically correct? (LLM/rubric verdict)
-    2. Response time       - how fast did the learner decide, relative to the
-                             scenario's expected/allowed time?
-    3. Response efficiency - did the learner use scarce resources (IV lines,
-                             O2, staff, transport slots, ...) economically,
-                             not more than the situation actually needed?
-    4. Ethical reasoning   - did the decision navigate the ethical dilemma
-                             well (fairness, consent, stewardship)?
-    5. Patient outcome     - the aggregate/final score for the attempt,
-                             combining the four metrics above.
-
-Each of the first four is normalized to 0-100 so `patient_outcome` can
-combine them with simple weights. Tune WEIGHTS below as your game design
-settles.
-"""
-
-# --- 1. Clinical accuracy -------------------------------------------------
-# Matches the scale you specified: correct / acceptable / incorrect / harmful.
 CLINICAL_ACCURACY_SCORES = {
     "correct": 100,
     "acceptable": 70,
@@ -27,22 +8,13 @@ CLINICAL_ACCURACY_SCORES = {
 }
 
 
+# Maps an LLM/rubric clinical verdict to a 0-100 score
 def clinical_accuracy_score(clinical_verdict: str) -> int:
-    """clinical_verdict comes from rag_pipeline.evaluate_decision() or rubric.score_decision()."""
-    return CLINICAL_ACCURACY_SCORES.get(clinical_verdict, 30)  # default to "incorrect" if unrecognized
+    return CLINICAL_ACCURACY_SCORES.get(clinical_verdict, 30)
 
 
-# --- 2. Response time ------------------------------------------------------
+# Scores decision speed against the scenario's expected time, decaying to 0 by 3x overrun
 def response_time_score(time_taken_seconds: float, expected_seconds: float) -> int:
-    """
-    Full marks for deciding at or under the expected time.
-    Score decays linearly to 0 at 3x the expected time (an unresponsive
-    learner in an emergency scenario should score poorly), floored at 0.
-
-    Tune `expected_seconds` per decision point in your scenario JSON
-    (e.g. `data/scenarios/level_1.json` decision_points) rather than
-    hardcoding one value for every scenario.
-    """
     if expected_seconds <= 0:
         return 100
     if time_taken_seconds <= expected_seconds:
@@ -52,18 +24,8 @@ def response_time_score(time_taken_seconds: float, expected_seconds: float) -> i
     return max(0, min(100, round(score)))
 
 
-# --- 3. Response efficiency (scarce-resource use) --------------------------
+# Scores resource use against the scenario's optimal count, penalizing over- and under-use
 def response_efficiency_score(resources_used: int, resources_optimal: int) -> int:
-    """
-    Penalizes both over-use (wasting scarce resources - see
-    `crisis_standards_of_care_ethics.json` -> "stewardship of resources")
-    and under-use (skipping a resource the situation actually required).
-
-    resources_used / resources_optimal are counts you decide how to define
-    per decision point, e.g. number of IV lines, O2 masks, ambulance slots,
-    or "resource units" consumed relative to what the scenario's answer key
-    says was actually needed.
-    """
     if resources_optimal <= 0:
         return 100 if resources_used == 0 else 60
     deviation = abs(resources_used - resources_optimal) / resources_optimal
@@ -71,21 +33,13 @@ def response_efficiency_score(resources_used: int, resources_optimal: int) -> in
     return max(0, min(100, round(score)))
 
 
-# --- 4. Ethical reasoning ---------------------------------------------------
+# Rescales the LLM/rubric's 0-10 ethical score to 0-100
 def ethical_reasoning_score(ethical_score_0_to_10: float) -> int:
-    """
-    `ethical_score_0_to_10` is produced by the LLM in rag_pipeline.evaluate_decision()
-    (grounded in biomedical_ethics_principles.json / crisis_standards_of_care_ethics.json),
-    or by rubric.score_decision() as a fallback. This just rescales 0-10 -> 0-100.
-    """
     return max(0, min(100, round(ethical_score_0_to_10 * 10)))
 
 
-# --- 5. Patient outcome (aggregate) ----------------------------------------
+# Maps an aggregate total score to a coarse outcome label for reports/UI
 def outcome_label(total: float) -> str:
-    """Shared label thresholds — used both for a single attempt's aggregate
-    (patient_outcome_score, below) and for the dashboard/room reports which
-    aggregate ACROSS multiple already-averaged attempts."""
     if total >= 85:
         return "Patient Stabilized - Excellent Care"
     elif total >= 70:
@@ -104,6 +58,7 @@ WEIGHTS = {
 }
 
 
+# Computes all 4 per-decision metrics plus the weighted total for one decision point
 def decision_scorecard(
     clinical_verdict: str,
     time_taken_seconds: float,
@@ -112,7 +67,6 @@ def decision_scorecard(
     resources_optimal: int,
     ethical_score_0_to_10: float,
 ) -> dict:
-    """Compute all 4 per-decision metrics + a weighted total for ONE decision point."""
     scores = {
         "clinical_accuracy": clinical_accuracy_score(clinical_verdict),
         "response_time": response_time_score(time_taken_seconds, expected_seconds),
@@ -123,12 +77,8 @@ def decision_scorecard(
     return scores
 
 
+# Aggregates metric #5 (patient outcome) across every decision point in one attempt
 def patient_outcome_score(decision_scorecards: list[dict]) -> dict:
-    """
-    Aggregate metric #5 across every decision point in an attempt.
-    Returns the average of each metric plus an overall total, and a coarse
-    outcome label for the report/UI (e.g. "Patient Stabilized").
-    """
     if not decision_scorecards:
         return {"average_total": 0, "outcome_label": "No decisions recorded"}
 
@@ -142,14 +92,8 @@ def patient_outcome_score(decision_scorecards: list[dict]) -> dict:
     return averages
 
 
+# Aggregates multiple already-computed outcomes (across attempts) into one combined outcome
 def aggregate_outcomes(outcomes: list[dict]) -> dict:
-    """
-    Aggregate a list of already-computed outcome dicts (e.g. one per Attempt,
-    each shaped like patient_outcome_score()'s return) into one combined
-    outcome. Used by the dashboard report (across ALL of a learner's
-    attempts) and the room/assessment report (across all attempts within
-    one room) — same shape, same label thresholds, different `outcomes` input.
-    """
     if not outcomes:
         return {
             "clinical_accuracy": 0, "response_time": 0, "response_efficiency": 0,

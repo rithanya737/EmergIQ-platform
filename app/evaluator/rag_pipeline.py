@@ -1,17 +1,4 @@
-"""
-Retrieval-Augmented Generation pipeline for scoring a learner's decision.
-
-Flow:
-  1. Embed the learner's decision/situation text.
-  2. Query Chroma for the top-k most relevant chunks (clinical protocols
-     AND ethics documents live in the same collection, so a dilemma-heavy
-     decision naturally retrieves ethics context too).
-  3. Build a prompt that gives the LLM: the scenario, the learner's decision,
-     and the retrieved excerpts as grounding context.
-  4. Call Ollama to generate a structured judgment covering BOTH clinical
-     accuracy and ethical reasoning, so app/evaluator/metrics.py can score
-     both dimensions from one LLM call.
-"""
+# RAG pipeline: retrieves grounded protocol/ethics context and asks the LLM to judge a decision
 import json
 
 import chromadb
@@ -37,19 +24,21 @@ SYSTEM_PROMPT = (
 )
 
 
+# Opens (or creates) the persistent Chroma collection holding indexed protocol chunks
 def _get_collection():
     client = chromadb.PersistentClient(path=CHROMA_PATH)
     return client.get_or_create_collection(COLLECTION_NAME)
 
 
+# Embeds the query and returns the top_k most relevant protocol/ethics chunks
 def retrieve_context(query_text: str, top_k: int = TOP_K) -> list[str]:
-    """Embed the query and return the top_k most relevant chunks."""
     collection = _get_collection()
     query_embedding = get_embedding(query_text)
     results = collection.query(query_embeddings=[query_embedding], n_results=top_k)
     return results["documents"][0] if results["documents"] else []
 
 
+# Builds the grounding prompt from the scenario, the learner's decision, and retrieved context
 def build_prompt(scenario_text: str, decision_text: str, context_chunks: list[str]) -> str:
     context_block = "\n".join(f"- {c}" for c in context_chunks) or "(no relevant protocol found)"
     return (
@@ -61,13 +50,8 @@ def build_prompt(scenario_text: str, decision_text: str, context_chunks: list[st
     )
 
 
+# Main entry point: retrieves context, prompts the LLM, and returns a structured judgment
 def evaluate_decision(scenario_text: str, decision_text: str) -> dict:
-    """
-    Main entry point called by app/evaluator/routes.py.
-    Returns a dict: {clinical_verdict, ethical_score, reasoning, missed_protocol_points}.
-    Raises ValueError if the LLM response isn't valid JSON — callers should
-    catch this and fall back to app/evaluator/rubric.py.
-    """
     context_chunks = retrieve_context(f"{scenario_text} {decision_text}")
     prompt = build_prompt(scenario_text, decision_text, context_chunks)
     raw_response = generate(prompt, system=SYSTEM_PROMPT)

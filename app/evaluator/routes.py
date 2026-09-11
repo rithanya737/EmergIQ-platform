@@ -1,21 +1,4 @@
-"""
-/evaluate/decision — internal endpoint called by app/game/engine.py whenever
-a learner submits a decision at a decision point.
-
-Expected JSON payload from the game engine:
-{
-  "scenario_text": "...",
-  "decision_text": "...",
-  "time_taken_seconds": 12.4,       # how long the learner took to decide
-  "expected_seconds": 20,           # from the scenario's decision_point config
-  "resources_used": 2,              # count of scarce resources the learner consumed
-  "resources_optimal": 2            # the scenario's answer-key optimal count
-}
-
-Returns the LLM/rubric judgment PLUS the 4 per-decision metric scores from
-app/evaluator/metrics.py (metric #5, patient_outcome, is aggregated across
-a whole attempt by app/evaluator/report_generator.py, not per decision).
-"""
+# Flask endpoint: judges a learner's submitted decision and returns its scorecard
 from flask import Blueprint, jsonify, request
 
 from app.evaluator.rag_pipeline import evaluate_decision
@@ -26,8 +9,8 @@ from app.evaluator.metrics import decision_scorecard
 bp = Blueprint("evaluator", __name__, url_prefix="/evaluate")
 
 
+# Tries the RAG+LLM path first, falling back to the deterministic rubric on any failure
 def _judgment_for(scenario_text: str, decision_text: str) -> dict:
-    """Try the RAG+LLM path; fall back to the deterministic rubric on any failure."""
     if is_reachable():
         try:
             result = evaluate_decision(scenario_text, decision_text)

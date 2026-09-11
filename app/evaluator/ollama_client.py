@@ -1,14 +1,4 @@
-"""
-Thin wrapper around the local Ollama HTTP API (default: http://localhost:11434).
-
-Ollama exposes two endpoints we care about:
-  - POST /api/embeddings  -> turn text into a vector (for Chroma)
-  - POST /api/generate    -> run a chat/completion model (for the evaluator's judgment)
-
-Before using this, pull the models on the machine running Ollama:
-    ollama pull nomic-embed-text     # embedding model
-    ollama pull llama3.1             # or mistral / phi3 / any chat model you prefer
-"""
+# Thin wrapper around the local Ollama HTTP API for embeddings, generation, and health checks
 import time
 
 import requests
@@ -17,19 +7,14 @@ from app.config import OLLAMA_HOST
 EMBED_MODEL = "nomic-embed-text"
 CHAT_MODEL = "llama3.2:1b"
 
-TIMEOUT = 60  # seconds; local LLM calls can be slow on CPU
+TIMEOUT = 60
 
-# is_reachable() is called on every single decision submission — without
-# caching, a down/slow Ollama means every decision (and, on the single-
-# threaded dev server, every other concurrent request too) eats a real
-# network timeout. Cache the result briefly so at most one check per
-# CHECK_INTERVAL actually hits the network.
-CHECK_INTERVAL = 15  # seconds
+CHECK_INTERVAL = 15
 _last_check = {"at": 0.0, "reachable": False}
 
 
+# Embeds text into a vector via Ollama's embeddings endpoint
 def get_embedding(text: str, model: str = EMBED_MODEL) -> list[float]:
-    """Return the embedding vector for `text` using Ollama's embeddings endpoint."""
     resp = requests.post(
         f"{OLLAMA_HOST}/api/embeddings",
         json={"model": model, "prompt": text},
@@ -39,11 +24,8 @@ def get_embedding(text: str, model: str = EMBED_MODEL) -> list[float]:
     return resp.json()["embedding"]
 
 
+# Runs a single-shot chat/completion generation and returns the raw text response
 def generate(prompt: str, model: str = CHAT_MODEL, system: str | None = None) -> str:
-    """
-    Run a single-shot generation and return the raw text response.
-    Uses stream=False so we get one JSON object back instead of a stream of chunks.
-    """
     payload = {"model": model, "prompt": prompt, "stream": False}
     if system:
         payload["system"] = system
@@ -53,11 +35,8 @@ def generate(prompt: str, model: str = CHAT_MODEL, system: str | None = None) ->
     return resp.json()["response"]
 
 
+# Cached health check so a down Ollama doesn't add a network timeout to every request
 def is_reachable() -> bool:
-    """Quick health check used by requirements_check.py and before every
-    decision judgment. Result is cached for CHECK_INTERVAL seconds so a
-    down Ollama doesn't add a network round-trip (and its timeout) to
-    every request while it's unreachable."""
     now = time.monotonic()
     if now - _last_check["at"] < CHECK_INTERVAL:
         return _last_check["reachable"]

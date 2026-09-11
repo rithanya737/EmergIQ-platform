@@ -1,20 +1,5 @@
-"""
-Rule-based fallback scorer.
+# Deterministic keyword-based fallback scorer used when the LLM/RAG path is unavailable
 
-Used when:
-  - Ollama/Chroma is unreachable, OR
-  - The LLM's response fails to parse as valid JSON (see rag_pipeline.evaluate_decision)
-
-Keeping a deterministic fallback means a demo never breaks just because the
-local LLM hiccupped or returned malformed output. Output shape matches
-rag_pipeline.evaluate_decision() so app/evaluator/metrics.py doesn't need to
-care which path produced the judgment.
-
-This is intentionally simple keyword/structure matching — extend
-KEYWORD_RULES as you add more scenario types.
-"""
-
-# keyword -> (clinical_verdict, ethical_score, reasoning)
 KEYWORD_RULES = {
     "airway": ("correct", 7, "Prioritizing airway aligns with the ABCDE sequence."),
     "bleeding": ("correct", 7, "Controlling major bleeding is a correct circulation-step priority."),
@@ -27,6 +12,7 @@ KEYWORD_RULES = {
 DEFAULT = ("acceptable", 5, "No strong keyword match; manual review recommended.")
 
 
+# Scores a decision by keyword match, falling back to a neutral default
 def score_decision(decision_text: str) -> dict:
     text = decision_text.lower()
     for keyword, (verdict, ethical_score, reasoning) in KEYWORD_RULES.items():
